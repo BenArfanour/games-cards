@@ -16,6 +16,9 @@ RUN { \
   echo "opcache.enable=1"; \
   echo "opcache.enable_cli=1"; \
   echo "opcache.validate_timestamps=0"; \
+  # OPcache preloading (optional, production): uncomment after cache:warmup --env=prod
+  # echo "opcache.preload=/var/www/html/config/preload.php"; \
+  # echo "opcache.preload_user=www-data"; \
 } > /usr/local/etc/php/conf.d/opcache.ini
 
 # Permissions (pour WSL/host)
