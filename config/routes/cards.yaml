@@ -1,3 +1,9 @@
-cards:
+cards_index:
   path: /cards
-  controller: App\UI\Http\CardsController
+  controller: App\UI\Http\CardsController::index
+  methods: [GET]
+
+cards_api:
+  path: /api/cards
+  controller: App\UI\Http\CardsController::api
+  methods: [GET]

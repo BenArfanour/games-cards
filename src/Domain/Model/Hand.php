@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace App\Domain\Model;
 
 final class Hand
@@ -6,15 +9,32 @@ final class Hand
     /** @var Card[] */
     private array $cards;
 
-    /** @param Card[] $cards */
+    /**
+     * @param Card[] $cards
+     *
+     * @throws \InvalidArgumentException
+     */
     public function __construct(array $cards)
     {
-        if (\count($cards) !== \count(array_unique(array_map(fn(Card $c) => (string)$c, $cards)))) {
-            throw new \InvalidArgumentException('Main contient des doublons.');
+        if ([] === $cards) {
+            throw new \InvalidArgumentException('Hand cannot be empty.');
         }
+
+        $seen = [];
+        foreach ($cards as $card) {
+            $key = $card->suit()->name().':'.$card->rank()->label();
+            if (isset($seen[$key])) {
+                throw new \InvalidArgumentException('Hand contains duplicate cards.');
+            }
+            $seen[$key] = true;
+        }
+
         $this->cards = array_values($cards);
     }
 
     /** @return Card[] */
-    public function cards(): array { return $this->cards; }
+    public function cards(): array
+    {
+        return $this->cards;
+    }
 }

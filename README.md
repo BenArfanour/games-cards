@@ -61,14 +61,18 @@ make game
 
 ## Configuration
 
-Les variables d'environnement sont définies dans `.env`. Pour le développement local, créez un fichier `.env.local` (non versionné) pour surcharger les valeurs :
+Copiez `.env.example` vers `.env.local` pour personnaliser votre environnement local :
 
 ```bash
-cp .env .env.local
+cp .env.example .env.local
 # Éditez .env.local et définissez un APP_SECRET unique
 ```
 
+Les variables d'environnement par défaut sont dans `.env`. Le fichier `.env.local` (non versionné) surcharge ces valeurs.
+
 > **Important :** ne commitez jamais de secrets réels. Utilisez `.env.local` pour vos valeurs personnelles.
+
+Pour les customisations Docker locales, copiez `docker-compose.override.dist.yml` vers `docker-compose.override.yml` (gitignored).
 
 ## Structure du projet
 
@@ -94,11 +98,13 @@ docker/
 ## Qualité de code
 
 ```bash
-make test    # Tests unitaires et fonctionnels
-make stan    # Analyse statique (niveau 6)
+make test    # Tests unitaires et fonctionnels (25 tests)
+make stan    # Analyse statique PHPStan (niveau 6 + extension Symfony)
 make cs      # Vérifier le style
 make fix     # Corriger le style automatiquement
 ```
+
+PHPUnit est configuré avec `failOnDeprecation=true` pour détecter les dépréciations Symfony dès les tests. Les rapports de couverture sont générés dans `var/coverage/` lorsque Xdebug ou PCOV est disponible.
 
 ## Licence
 
