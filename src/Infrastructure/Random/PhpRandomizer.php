@@ -20,11 +20,13 @@ final class PhpRandomizer implements RandomizerInterface
         if ($count > $maxExclusive) {
             throw new \InvalidArgumentException('count > population');
         }
-        $result = [];
-        while (\count($result) < $count) {
-            $i = $this->randomizer->getInt(0, $maxExclusive - 1);
-            $result[$i] = true;
+        if ($count === 0) {
+            return [];
         }
-        return array_keys($result);
+
+        $keys = range(0, $maxExclusive - 1);
+        $this->randomizer->shuffleArray($keys);
+
+        return \array_slice($keys, 0, $count);
     }
 }
