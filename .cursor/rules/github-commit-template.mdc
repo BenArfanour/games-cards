@@ -1,0 +1,50 @@
+---
+description: Conventional commit template for git and GitHub MCP — type(topic): description ISSUE-ID
+alwaysApply: true
+---
+
+# Commit template (required — auto-applies every session)
+
+This rule is **always active** in this project. You do not need the user to @-mention it.
+
+Before **any** commit — local `git commit` **or GitHub MCP** — read `.github/COMMIT_TEMPLATE.md` and format the message accordingly.
+
+## Subject line format
+
+```
+<type>(<topic>): <description> <ISSUE-ID>
+```
+
+- **type:** `feat` | `fix` | `chore` | `docs` | `refactor` | `test` | `ci` | `build` | `perf` | `style`
+- **topic:** module or area (e.g. `cards`, `auth`, `api`, `ci`)
+- **description:** imperative, concise summary
+- **ISSUE-ID:** GitHub issue or ticket at the end (e.g. `#42`, `GC-12`)
+
+Example: `feat(cards): add hand deal endpoint #42`
+
+## GitHub MCP (mandatory on every MCP commit)
+
+Whenever you call a GitHub MCP tool that creates a commit, **apply this template first**:
+
+- `push_files`
+- `create_or_update_file`
+
+Build the `message` argument as:
+
+1. Subject: `type(topic): description ISSUE-ID`
+2. Blank line
+3. Short paragraph explaining **why**
+4. `Changes:` bullet list
+
+Ask for type, topic, and issue ID if not inferable from branch, PR, or user message.
+
+## Branch naming
+
+Prefer: `type/topic-issue-id` (e.g. `feat/cards-42`).
+
+## Do not
+
+- Put the issue ID at the **start** of the subject (it goes at the **end**)
+- Use generic messages ("fix", "updates", "wip")
+- Omit type or topic
+- Include PR numbers or Co-authored-by unless requested
