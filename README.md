@@ -1,111 +1,132 @@
 # Games Cards
 
-Démonstration Symfony 6.4 de distribution et de tri de cartes à jouer — interface web et commande CLI, entièrement conteneurisée avec Docker.
+Symfony 6.4 card-dealing API with JWT authentication, Bootstrap demo UI, and clean architecture — fully containerized with Docker.
 
-## Fonctionnalités
+## Features
 
-- **Distribution aléatoire** de mains à partir d'un jeu standard de 52 cartes
-- **Tri personnalisable** selon un ordre aléatoire de couleurs et de rangs
-- **Interface web** sur `/cards` avec affichage des mains triée et non triée
-- **Commande CLI** `app:deal-cards` pour tester le moteur en terminal
-- **Architecture hexagonale** légère : Domain, Application, Infrastructure, UI
+- **Random dealing** from a standard 52-card deck
+- **Custom sorting** by random suit and rank order
+- **JWT API** — login, refresh token, protected `/cards` and `/api/hands/deal`
+- **Web demo** at `/demo` and OpenAPI docs at `/api/doc`
+- **CLI** `app:deal-cards` for terminal testing
+- **Clean architecture** — Domain, Application, Infrastructure, UI
 
-## Stack technique
+## Stack
 
-| Composant | Version |
+| Component | Version |
 |-----------|---------|
 | PHP | 8.2 (Docker) |
 | Symfony | 6.4 |
-| Serveur web | Nginx 1.25 + PHP-FPM |
+| Web server | Nginx 1.25 + PHP-FPM |
 | Tests | PHPUnit 11 |
-| Qualité | PHPStan 2, PHP-CS-Fixer |
+| Quality | PHPStan 2, PHP-CS-Fixer |
 
-## Prérequis
+## Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) et Docker Compose
-- WSL2 supporté sous Windows
+- [Docker](https://docs.docker.com/get-docker/) and Docker Compose
+- WSL2 supported on Windows
 
-## Démarrage rapide
+## Quick start
 
 ```bash
-# 1. Démarrer l'environnement (build + containers)
 make up
-
-# 2. Installer les dépendances PHP
 make install
-
-# 3. Ouvrir l'application
-#    → http://localhost:8080/cards
+# → http://localhost:8080/demo
 ```
 
-Pour distribuer une main via le terminal :
+CLI:
 
 ```bash
 make game
 ```
 
-## Commandes Makefile
+## Makefile commands
 
-| Commande | Description |
-|----------|-------------|
-| `make up` | Build et démarrage des containers (php-fpm + nginx) |
-| `make down` | Arrêt et suppression des containers et volumes |
-| `make install` | `composer install` dans le container PHP |
-| `make game` | Lance la commande CLI `app:deal-cards` |
-| `make test` | Exécute la suite PHPUnit |
-| `make stan` | Analyse statique PHPStan |
-| `make cs` | Vérification du code style (dry-run) |
-| `make fix` | Correction automatique du code style |
-| `make sh` | Ouvre un shell bash dans le container PHP |
-| `make composer cmd="…"` | Exécute une commande Composer arbitraire |
+| Command | Description |
+|---------|-------------|
+| `make up` | Build and start containers (PHP-FPM + Nginx) |
+| `make down` | Stop containers |
+| `make install` | `composer install`, JWT keys, migrations |
+| `make game` | Run CLI `app:deal-cards` |
+| `make test` | Run PHPUnit suite |
+| `make stan` | PHPStan static analysis |
+| `make cs` | Code style check (dry-run) |
+| `make fix` | Auto-fix code style |
+| `make quality` | `test` + `stan` + `cs` (README quality gates) |
+| `make ci` | `install` + `quality` (same as GitHub Actions CI) |
+| `make sh` | Shell into PHP container |
+
+## Code quality
+
+Run the same gates locally as CI:
+
+```bash
+make install
+make test    # Unit + functional tests (PHPUnit)
+make stan    # Static analysis (PHPStan level 6 + Symfony extension)
+make cs      # Code style check (PHP-CS-Fixer dry-run)
+make fix     # Auto-fix style issues
+```
+
+Or in one step after install:
+
+```bash
+make quality    # test + stan + cs
+make ci         # install + quality (mirrors GitHub Actions)
+```
+
+PHPUnit uses `failOnDeprecation=true`. Coverage reports go to `var/coverage/` when Xdebug or PCOV is available.
+
+## CI (GitHub Actions)
+
+Workflow `.github/workflows/quality.yml` runs on every push and pull request to `main`:
+
+1. `make install`
+2. `make test`
+3. `make stan`
+4. `make cs`
 
 ## Configuration
 
-Copiez `.env.example` vers `.env.local` pour personnaliser votre environnement local :
+Copy `.env.example` to `.env.local` for local overrides:
 
 ```bash
 cp .env.example .env.local
-# Éditez .env.local et définissez un APP_SECRET unique
 ```
 
-Les variables d'environnement par défaut sont dans `.env`. Le fichier `.env.local` (non versionné) surcharge ces valeurs.
+Never commit real secrets. Use `.env.local` (gitignored) for personal values.
 
-> **Important :** ne commitez jamais de secrets réels. Utilisez `.env.local` pour vos valeurs personnelles.
+For local Docker overrides, copy `docker-compose.override.dist.yml` to `docker-compose.override.yml`.
 
-Pour les customisations Docker locales, copiez `docker-compose.override.dist.yml` vers `docker-compose.override.yml` (gitignored).
-
-## Structure du projet
+## Project structure
 
 ```
 src/
-├── Domain/           # Modèles métier (Card, Hand, Suit, Rank)
-├── Application/      # Services et ports (HandDealer, HandSorter, …)
-├── Infrastructure/   # Implémentations techniques (PhpRandomizer)
+├── Domain/           # Card, Hand, Suit, Rank
+├── Application/      # HandDealer, HandSorter, HandDealingService, …
+├── Infrastructure/   # PhpRandomizer, …
 └── UI/
-    ├── Http/         # Contrôleur web (CardsController)
-    └── Console/      # Commande CLI (DealCardsCommand)
+    ├── Http/         # Controllers, DTOs (JWT API)
+    └── Console/      # DealCardsCommand
 config/
-├── routes/           # Définition des routes YAML
-└── packages/         # Configuration Symfony
+├── routes/
+└── packages/
 tests/
-├── Unit/             # Tests unitaires
-└── Functional/       # Tests fonctionnels (HTTP, CLI)
+├── Unit/
+└── Functional/
+postman/              # API collection
 docker/
-├── php/Dockerfile    # Image PHP-FPM
-└── nginx/            # Configuration Nginx
+├── php/Dockerfile
+└── nginx/
 ```
 
-## Qualité de code
+## API
 
-```bash
-make test    # Tests unitaires et fonctionnels (25 tests)
-make stan    # Analyse statique PHPStan (niveau 6 + extension Symfony)
-make cs      # Vérifier le style
-make fix     # Corriger le style automatiquement
-```
+- OpenAPI: http://localhost:8080/api/doc
+- Postman: `postman/games-cards.postman_collection.json`
 
-PHPUnit est configuré avec `failOnDeprecation=true` pour détecter les dépréciations Symfony dès les tests. Les rapports de couverture sont générés dans `var/coverage/` lorsque Xdebug ou PCOV est disponible.
+See `AGENTS.md`, `DEPLOY.md`, and `CHANGELOG.md` for team workflow and releases.
 
-## Licence
+## License
 
-Projet propriétaire — usage interne / démonstration.
+Proprietary — internal / demonstration use.
