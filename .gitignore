@@ -24,3 +24,9 @@ phpstan.neon
 ###< phpunit/phpunit ###
 
 docker-compose.override.yml
+
+/var/data*.db
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
