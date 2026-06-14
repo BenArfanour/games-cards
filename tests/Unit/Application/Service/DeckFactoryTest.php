@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Service;
@@ -8,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 final class DeckFactoryTest extends TestCase
 {
-    public function test_deck_has_52_unique_cards(): void
+    public function testDeckHas52UniqueCards(): void
     {
         $deck = (new DeckFactory())->standardDeck();
 

@@ -1,8 +1,12 @@
+.PHONY: up down down-v sh game composer install test cs fix stan
 
 up:
 	docker compose up -d --build
 
 down:
+	docker compose down
+
+down-v:
 	docker compose down -v
 
 sh:

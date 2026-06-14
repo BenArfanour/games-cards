@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * OPcache preloading entry point (production only).
  *

@@ -1,4 +1,14 @@
 .git
-vendor
-var
+.github
+.idea
+.phpunit.cache
+.php-cs-fixer.cache
+.env.local
+.env.*.local
+docker-compose.override.yml
 node_modules
+tests
+README.md
+_push_result.txt
+var
+vendor

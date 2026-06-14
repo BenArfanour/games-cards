@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Tests\Unit\Domain\Model;
@@ -11,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 final class HandTest extends TestCase
 {
-    public function test_no_duplicates_allowed(): void
+    public function testNoDuplicatesAllowed(): void
     {
         $c1 = new Card(Suit::from('Cœur'), Rank::from('As'));
         $c2 = new Card(Suit::from('Cœur'), Rank::from('Roi'));
@@ -21,5 +22,11 @@ final class HandTest extends TestCase
 
         $this->expectException(\InvalidArgumentException::class);
         new Hand([$c1, $c1]);
+    }
+
+    public function testEmptyHandThrows(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new Hand([]);
     }
 }
