@@ -62,7 +62,7 @@
         "post-install-cmd": [
             "@auto-scripts"
         ],
-        "post-update-ccmd": [
+        "post-update-cmd": [
             "@auto-scripts"
         ]
     },
