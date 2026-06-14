@@ -13,6 +13,13 @@ final class PhpRandomizer implements RandomizerInterface
     {
     }
 
+    /**
+     * @template T
+     *
+     * @param array<T> $items
+     *
+     * @return array<T>
+     */
     public function shuffle(array $items): array
     {
         $this->randomizer->shuffleArray($items);
@@ -20,6 +27,7 @@ final class PhpRandomizer implements RandomizerInterface
         return $items;
     }
 
+    /** @return list<int> */
     public function uniqueIndexes(int $maxExclusive, int $count): array
     {
         if ($count > $maxExclusive) {
@@ -32,6 +40,9 @@ final class PhpRandomizer implements RandomizerInterface
         $keys = range(0, $maxExclusive - 1);
         $this->randomizer->shuffleArray($keys);
 
-        return \array_slice($keys, 0, $count);
+        /** @var list<int> $picked */
+        $picked = \array_slice($keys, 0, $count);
+
+        return $picked;
     }
 }

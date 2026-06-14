@@ -15,11 +15,19 @@ final class RandomOrderGenerator implements OrderGeneratorInterface
     {
     }
 
-    /** @return array{ suits: array<string,int>, ranks: array<string,int> } */
+    /** @return array{suits: array<string, int>, ranks: array<string, int>} */
     public function generate(): array
     {
-        $suits = array_values($this->rng->shuffle(Suit::all()));
-        $ranks = array_values($this->rng->shuffle(Rank::all()));
+        /** @var list<string> $suits */
+        $suits = array_map(
+            static fn (Suit $suit): string => $suit->value,
+            $this->rng->shuffle(Suit::cases()),
+        );
+        /** @var list<string> $ranks */
+        $ranks = array_map(
+            static fn (Rank $rank): string => $rank->value,
+            $this->rng->shuffle(Rank::cases()),
+        );
 
         return [
             'suits' => array_flip($suits),

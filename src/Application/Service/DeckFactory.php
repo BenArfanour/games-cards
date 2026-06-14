@@ -15,10 +15,9 @@ final class DeckFactory implements DeckFactoryInterface
     public function standardDeck(): array
     {
         $deck = [];
-        foreach (Suit::all() as $suitName) {
-            $suit = Suit::unchecked($suitName);
-            foreach (Rank::all() as $rankLabel) {
-                $deck[] = new Card($suit, Rank::unchecked($rankLabel));
+        foreach (Suit::cases() as $suit) {
+            foreach (Rank::cases() as $rank) {
+                $deck[] = new Card($suit, $rank);
             }
         }
 

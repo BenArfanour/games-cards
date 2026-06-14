@@ -35,7 +35,11 @@ final class CardsControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'application/json');
 
-        $data = json_decode($client->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $content = $client->getResponse()->getContent();
+        self::assertIsString($content);
+
+        /** @var array{unsorted: list<string>, sorted: list<string>} $data */
+        $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
         self::assertCount(10, $data['unsorted']);
         self::assertCount(10, $data['sorted']);
     }

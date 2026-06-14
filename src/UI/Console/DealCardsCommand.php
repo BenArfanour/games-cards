@@ -32,7 +32,11 @@ final class DealCardsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $count = (int) $input->getOption('count');
+        $countOption = $input->getOption('count');
+        if (!is_scalar($countOption)) {
+            throw new \InvalidArgumentException('Option "count" must be a scalar value.');
+        }
+        $count = (int) $countOption;
         $orders = $this->orderGenerator->generate();
         $hand = $this->dealer->deal($count);
         $sorted = $this->sorter->sort($hand, $orders);

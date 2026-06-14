@@ -6,6 +6,8 @@ namespace App\Tests\Unit\Application\Service;
 
 use App\Application\Port\RandomizerInterface;
 use App\Application\Service\RandomOrderGenerator;
+use App\Domain\ValueObject\Rank;
+use App\Domain\ValueObject\Suit;
 use PHPUnit\Framework\TestCase;
 
 final class RandomOrderGeneratorTest extends TestCase
@@ -14,8 +16,8 @@ final class RandomOrderGeneratorTest extends TestCase
     {
         $rng = $this->createMock(RandomizerInterface::class);
         $rng->method('shuffle')->willReturnOnConsecutiveCalls(
-            ['Pique', 'Cœur'],
-            ['Roi', 'As'],
+            [Suit::Spades, Suit::Hearts],
+            [Rank::King, Rank::Ace],
         );
 
         $generator = new RandomOrderGenerator($rng);

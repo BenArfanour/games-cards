@@ -11,22 +11,23 @@ final class RankTest extends TestCase
 {
     public function testAllAndFrom(): void
     {
-        self::assertContains('As', Rank::all());
-        self::assertSame('As', (string) Rank::from('As'));
+        $values = array_map(static fn (Rank $rank): string => $rank->value, Rank::all());
+        self::assertContains('As', $values);
+        self::assertSame(Rank::Ace, Rank::from('As'));
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\ValueError::class);
         Rank::from('Invalid');
     }
 
-    public function testEquals(): void
+    public function testEnumIdentity(): void
     {
-        self::assertTrue(Rank::from('As')->equals(Rank::from('As')));
-        self::assertFalse(Rank::from('As')->equals(Rank::from('Roi')));
+        self::assertSame(Rank::Ace, Rank::from('As'));
+        self::assertNotSame(Rank::Ace, Rank::King);
     }
 
-    public function testConstantsMatchAll(): void
+    public function testCaseValues(): void
     {
-        self::assertSame(Rank::ACE, 'As');
-        self::assertSame(Rank::KING, 'Roi');
+        self::assertSame('As', Rank::Ace->value);
+        self::assertSame('Roi', Rank::King->value);
     }
 }
