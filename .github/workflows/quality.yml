@@ -1,0 +1,62 @@
+name: Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint & test (make ci)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js (Newman)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build and start containers
+        run: docker compose up -d --build
+
+      - name: Wait for PHP container
+        run: |
+          for i in $(seq 1 30); do
+            docker compose exec -T php php -r 'exit(0);' && exit 0
+            sleep 2
+          done
+          echo "PHP container did not become ready in time"
+          exit 1
+
+      - name: Wait for HTTP
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8080/demo >/dev/null && exit 0
+            sleep 2
+          done
+          echo "App did not respond on :8080"
+          exit 1
+
+      - name: Install dependencies and prepare app
+        run: make install
+
+      - name: Run full-app quality gates
+        run: make lint
+
+      - name: Postman API contract tests
+        run: make postman
+
+      - name: Smoke tests
+        run: make smoke
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs --no-color

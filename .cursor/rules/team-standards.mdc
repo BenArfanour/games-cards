@@ -1,0 +1,55 @@
+---
+description: Team delivery standards — testing before PR, TDD only when complexity warrants it
+alwaysApply: true
+---
+
+# Team Standards (games-cards)
+
+## TDD — when to use
+
+**Do not force red-green-refactor on every task.**
+
+| Complexity | Approach |
+|------------|----------|
+| **Simple** | Implement, then add tests. Examples: thin controller wiring, config, DTO with obvious constraints, one-line delegation to a service. |
+| **Complex** | Use TDD (failing test first). Examples: domain rules, sorting/dealing algorithms, multi-step workflows, authorization logic, non-trivial edge cases. |
+
+When unsure, ask once — default to **implement + test**, not strict TDD.
+
+## Testing — always before PR
+
+Every feature must ship with **both**:
+
+1. **Unit tests** (`tests/Unit/`) — application services, domain logic, validators, DTO constraints.
+2. **Functional tests** (`tests/Functional/`) — HTTP contract via `WebTestCase`.
+
+Cover **all relevant scenarios** for the feature:
+
+- Happy path (200/201)
+- Missing or invalid JWT → **401**
+- Authenticated but wrong role → **403**
+- Validation errors → **422** (or **400** for malformed body)
+- Missing resource → **404** (when applicable)
+
+Use `AuthenticatedApiClientTrait` for JWT functional tests. Reuse existing patterns in `tests/Functional/UI/Http/`.
+
+## PR gate (mandatory)
+
+Do **not** open or suggest a PR until:
+
+```bash
+make lint
+```
+
+Equivalent: `make test && make stan && make cs` plus Symfony linters. Or use **`/lint-app`** in Cursor.
+
+All tests green. No new PHPStan errors in touched code. Report gate results when finishing.
+
+## Code review
+
+Before PR, run **`/staff-review`**. One **staff architecture reviewer** — holistic pass (clean architecture, Symfony/PHP best practices, performance, security, tests, craftsmanship). Not separate category reviewers.
+
+## Scope
+
+- Minimal diff — no unrelated refactors in the same change.
+- Match clean architecture layers already in this repo (Domain / Application / Infrastructure / UI).

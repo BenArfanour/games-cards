@@ -1,0 +1,46 @@
+---
+description: Ship and release workflow — GitHub MCP, CI, tags, deploy, smoke tests
+alwaysApply: false
+---
+
+# Ship workflow (games-cards)
+
+## Before PR
+
+```bash
+make ci
+/staff-review
+/pr-ready          # opens PR via GitHub MCP when asked
+```
+
+## After merge — ship
+
+```bash
+/ship
+```
+
+Agent uses **GitHub MCP** (`user-github`):
+
+- `pull_request_read` → `get_check_runs` (CI on PR)
+- `list_commits`, `get_commit`, `get_latest_release`, `list_tags`
+
+Always run locally:
+
+```bash
+make up
+make ship-check    # ci + smoke + postman
+```
+
+## Release tag (creates GitHub Release via Actions)
+
+```bash
+git pull origin main
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+Workflow `.github/workflows/release.yml` publishes release notes.
+
+## Production deploy
+
+Only after explicit **"deploy to prod"** — follow `DEPLOY.md`.

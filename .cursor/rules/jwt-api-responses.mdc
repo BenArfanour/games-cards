@@ -1,0 +1,39 @@
+---
+description: JWT-protected API — validation, authorization, and consistent HTTP status codes
+globs: "src/UI/Http/**/*.php"
+alwaysApply: false
+---
+
+# JWT API — Validation & Access Control
+
+Protected routes use Lexik JWT (`security.yaml` firewalls + `access_control`). Keep responses **predictable and readable** for API consumers.
+
+## HTTP status code map
+
+| Situation | Status | Response shape |
+|-----------|--------|----------------|
+| Success | **200** / **201** | JSON body from response DTO |
+| Malformed JSON or wrong `Content-Type` | **400** | `{ "error": "...", "message": "..." }` or Symfony default |
+| No `Authorization` header or invalid/expired JWT | **401** | Lexik / security handler (do not custom-map to 500) |
+| Valid JWT but missing role (e.g. needs `ROLE_API`) | **403** | `{ "error": "Access denied" }` or voter message |
+| Referenced entity/id not found | **404** | Consistent JSON error helper |
+| DTO / constraint validation failed | **422** | `{ "errors": { "field": "message" } }` via `MapRequestPayload` |
+| Unexpected server bug | **500** | Generic message in prod; log details — **never** use 500 for auth or validation |
+
+**Never return 500 for client mistakes** (bad input, missing token, forbidden role).
+
+## Implementation checklist (each new endpoint)
+
+1. **Firewall** — route under `^/api` or dedicated JWT firewall (`config/packages/security.yaml`).
+2. **access_control** — set required role(s), e.g. `ROLE_API`.
+3. **Request DTO** — `#[MapRequestPayload]` + Symfony Validator constraints on DTO properties.
+4. **OpenAPI** — document 200, 401, 403 (if role-restricted), 422; use `#[Security(name: 'Bearer')]`.
+5. **Functional tests** — assert status code and response shape for each scenario above.
+
+## Authorization beyond roles
+
+When a user may access only **their own** resource, use a **voter** or service check → **403** (not 404, unless hiding existence is required).
+
+## Postman / OpenAPI
+
+Keep Nelmio attributes and `postman/games-cards.postman_collection.json` in sync when routes or error shapes change.
