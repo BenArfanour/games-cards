@@ -3,7 +3,11 @@
 ## Prérequis
 - **Docker** + **Docker Compose** installés (WSL2 OK).
 
+<<<<<<< HEAD
 ## 1) Lancer l'environnement
+=======
+## 1) Lancer l’environnement
+>>>>>>> ea1b950 (Initial)
 ```bash
 make up
 
@@ -15,7 +19,11 @@ Ouvre : http://localhost:8080
 make install
 
 
+<<<<<<< HEAD
 3) Lancer l'UI Web
+=======
+3) Lancer l’UI Web
+>>>>>>> ea1b950 (Initial)
 Aller sur : http://localhost:8080/cards
 
 4) Lancer la CLI
