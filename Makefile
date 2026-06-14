@@ -1,10 +1,13 @@
-.PHONY: up down down-v sh game composer install test cs fix stan jwt-keys db-migrate lint lint-fix ci postman smoke ship-check
+.PHONY: up down down-v sh game composer install test cs fix stan jwt-keys db-migrate quality lint lint-fix ci postman smoke ship-check
+
+# Quality gates documented in README.md
+quality: test stan cs
 
 lint: cs stan lint-symfony test
 
 lint-fix: fix lint
 
-ci: install lint
+ci: install quality
 
 ship-check: ci smoke postman
 
