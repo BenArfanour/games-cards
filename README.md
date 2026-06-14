@@ -1,53 +1,105 @@
-# Installation & utilisation (via Makefile)
+# Games Cards
+
+Démonstration Symfony 6.4 de distribution et de tri de cartes à jouer — interface web et commande CLI, entièrement conteneurisée avec Docker.
+
+## Fonctionnalités
+
+- **Distribution aléatoire** de mains à partir d'un jeu standard de 52 cartes
+- **Tri personnalisable** selon un ordre aléatoire de couleurs et de rangs
+- **Interface web** sur `/cards` avec affichage des mains triée et non triée
+- **Commande CLI** `app:deal-cards` pour tester le moteur en terminal
+- **Architecture hexagonale** légère : Domain, Application, Infrastructure, UI
+
+## Stack technique
+
+| Composant | Version |
+|-----------|---------|
+| PHP | 8.2 (Docker) |
+| Symfony | 6.4 |
+| Serveur web | Nginx 1.25 + PHP-FPM |
+| Tests | PHPUnit 11 |
+| Qualité | PHPStan 2, PHP-CS-Fixer |
 
 ## Prérequis
-- **Docker** + **Docker Compose** installés (WSL2 OK).
 
-## 1) Lancer l'environnement
+- [Docker](https://docs.docker.com/get-docker/) et Docker Compose
+- WSL2 supporté sous Windows
+
+## Démarrage rapide
+
 ```bash
+# 1. Démarrer l'environnement (build + containers)
 make up
 
-Build + start des containers (php-fpm + nginx).
-Ouvre : http://localhost:8080
-
-
-2) Installer les dépendances PHP (dans le conteneur)
+# 2. Installer les dépendances PHP
 make install
 
+# 3. Ouvrir l'application
+#    → http://localhost:8080/cards
+```
 
-3) Lancer l'UI Web
-Aller sur : http://localhost:8080/cards
+Pour distribuer une main via le terminal :
 
-4) Lancer la CLI
+```bash
 make game
+```
 
-5) Lancer les tests:
-make test     # PHPUnit
+## Commandes Makefile
 
-(Optionnel) Qualité :
-make stan     # PHPStan
-make cs       # Vérif code style
-make fix      # Auto-fix code style
+| Commande | Description |
+|----------|-------------|
+| `make up` | Build et démarrage des containers (php-fpm + nginx) |
+| `make down` | Arrêt et suppression des containers et volumes |
+| `make install` | `composer install` dans le container PHP |
+| `make game` | Lance la commande CLI `app:deal-cards` |
+| `make test` | Exécute la suite PHPUnit |
+| `make stan` | Analyse statique PHPStan |
+| `make cs` | Vérification du code style (dry-run) |
+| `make fix` | Correction automatique du code style |
+| `make sh` | Ouvre un shell bash dans le container PHP |
+| `make composer cmd="…"` | Exécute une commande Composer arbitraire |
 
+## Configuration
 
-6) Ouvrir un shell dans le conteneur PHP (si besoin):
-make sh
+Les variables d'environnement sont définies dans `.env`. Pour le développement local, créez un fichier `.env.local` (non versionné) pour surcharger les valeurs :
 
+```bash
+cp .env .env.local
+# Éditez .env.local et définissez un APP_SECRET unique
+```
 
-Raccourcis Makefile disponibles
+> **Important :** ne commitez jamais de secrets réels. Utilisez `.env.local` pour vos valeurs personnelles.
 
-make up : build & start containers
+## Structure du projet
 
-make down : stop & remove containers
+```
+src/
+├── Domain/           # Modèles métier (Card, Hand, Suit, Rank)
+├── Application/      # Services et ports (HandDealer, HandSorter, …)
+├── Infrastructure/   # Implémentations techniques (PhpRandomizer)
+└── UI/
+    ├── Http/         # Contrôleur web (CardsController)
+    └── Console/      # Commande CLI (DealCardsCommand)
+config/
+├── routes/           # Définition des routes YAML
+└── packages/         # Configuration Symfony
+tests/
+├── Unit/             # Tests unitaires
+└── Functional/       # Tests fonctionnels (HTTP, CLI)
+docker/
+├── php/Dockerfile    # Image PHP-FPM
+└── nginx/            # Configuration Nginx
+```
 
-make install : composer install dans le conteneur
+## Qualité de code
 
-make test : exécuter PHPUnit
+```bash
+make test    # Tests unitaires et fonctionnels
+make stan    # Analyse statique (niveau 6)
+make cs      # Vérifier le style
+make fix     # Corriger le style automatiquement
+```
 
-make stan : PHPStan 
+## Licence
 
-make cs : check code style 
-
-make fix : auto-fix CS 
-
-make sh : shell dans le conteneur PHP
+Projet propriétaire — usage interne / démonstration.
