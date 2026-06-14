@@ -22,9 +22,7 @@ final class PhpRandomizer implements RandomizerInterface
      */
     public function shuffle(array $items): array
     {
-        $this->randomizer->shuffleArray($items);
-
-        return $items;
+        return $this->randomizer->shuffleArray($items);
     }
 
     /** @return list<int> */
@@ -38,10 +36,10 @@ final class PhpRandomizer implements RandomizerInterface
         }
 
         $keys = range(0, $maxExclusive - 1);
-        $this->randomizer->shuffleArray($keys);
+        $shuffled = $this->randomizer->shuffleArray($keys);
 
         /** @var list<int> $picked */
-        $picked = \array_slice($keys, 0, $count);
+        $picked = \array_slice($shuffled, 0, $count);
 
         return $picked;
     }

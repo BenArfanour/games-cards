@@ -4,35 +4,205 @@
 
 {% block stylesheets %}
   <style>
-    main { font: 16px/1.4 system-ui; max-width: 800px; margin: 2rem auto; }
-    section { margin-bottom: 1.5rem; }
-    h1 { margin-bottom: 1rem; }
-    ul { padding-left: 1.25rem; }
+    .hero-gradient {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    }
+
+    .playing-card {
+      width: 5.5rem;
+      height: 7.75rem;
+      border-radius: 0.65rem;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: #fff;
+      box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.12);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 0.45rem 0.5rem;
+      font-weight: 600;
+      line-height: 1.1;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .playing-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.18);
+    }
+
+    .playing-card.red { color: #c0392b; }
+    .playing-card.black { color: #1c2833; }
+
+    .playing-card .rank { font-size: 1.05rem; }
+    .playing-card .suit { font-size: 1.35rem; align-self: center; }
+    .playing-card .corner { font-size: 0.75rem; opacity: 0.85; }
+
+    .hand-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .order-badge {
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+    }
+
+    .panel-card {
+      border: none;
+      box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.06);
+    }
+
+    .panel-card .card-header {
+      font-weight: 600;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
   </style>
 {% endblock %}
 
+{% macro suit_symbol(suit) %}
+  {%- if suit == 'Carreaux' -%}♦
+  {%- elseif suit == 'Cœur' -%}♥
+  {%- elseif suit == 'Pique' -%}♠
+  {%- else -%}♣
+  {%- endif -%}
+{% endmacro %}
+
+{% macro suit_color(suit) %}
+  {{ suit in ['Carreaux', 'Cœur'] ? 'red' : 'black' }}
+{% endmacro %}
+
+{% macro render_card(label) %}
+  {% set parts = label|split(' de ') %}
+  {% set rank = parts[0] %}
+  {% set suit = parts[1] ?? '' %}
+  <li>
+    <div class="playing-card {{ _self.suit_color(suit) }}" title="{{ label }}">
+      <span class="corner">{{ rank }}<br>{{ _self.suit_symbol(suit) }}</span>
+      <span class="suit">{{ _self.suit_symbol(suit) }}</span>
+      <span class="rank">{{ rank }}</span>
+    </div>
+  </li>
+{% endmacro %}
+
 {% block body %}
-  <main>
-    <h1>Jeu de cartes — Démo</h1>
+  <nav class="navbar navbar-expand-lg navbar-dark hero-gradient shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-semibold" href="{{ path('demo_index') }}">
+        <i class="bi bi-suit-spade-fill me-2"></i>Games Cards
+      </a>
+      <div class="d-flex align-items-center gap-2">
+        <a class="btn btn-outline-light btn-sm" href="/api/doc" target="_blank" rel="noopener">
+          <i class="bi bi-journal-code me-1"></i>OpenAPI
+        </a>
+        <a class="btn btn-outline-light btn-sm" href="/cards" target="_blank" rel="noopener">
+          <i class="bi bi-braces me-1"></i>GET /cards
+        </a>
+        <button class="btn btn-light btn-sm" type="button" onclick="location.reload()">
+          <i class="bi bi-arrow-clockwise me-1"></i>Nouvelle main
+        </button>
+      </div>
+    </div>
+  </nav>
 
-    <section>
-      <h2>Ordres aléatoires</h2>
-      <p><strong>Couleurs</strong> : {{ orders.suits|join(', ') }}</p>
-      <p><strong>Valeurs</strong> : {{ orders.ranks|join(', ') }}</p>
+  <header class="hero-gradient text-white py-5 mb-4">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <p class="text-white-50 text-uppercase small fw-semibold mb-2 letter-spacing">Symfony 6.4 · PHP 8.2</p>
+          <h1 class="display-5 fw-bold mb-3">Jeu de cartes — Démo</h1>
+          <p class="lead text-white-50 mb-0">
+            Une main aléatoire de {{ unsorted|length }} cartes, triée selon un ordre de couleurs et de valeurs généré à la volée.
+          </p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+          <span class="badge rounded-pill text-bg-light text-dark px-3 py-2 fs-6">
+            <i class="bi bi-shuffle me-1"></i>{{ unsorted|length }} cartes
+          </span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container pb-5">
+    <section class="mb-4" data-testid="orders">
+      <div class="card panel-card">
+        <div class="card-header bg-white d-flex align-items-center gap-2">
+          <i class="bi bi-list-ol text-primary"></i>
+          Ordres aléatoires
+        </div>
+        <div class="card-body">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <h3 class="h6 text-uppercase text-muted mb-3">
+                <i class="bi bi-palette me-1"></i>Couleurs
+              </h3>
+              <div class="d-flex flex-wrap gap-2">
+                {% for suit in orders.suits %}
+                  <span class="badge rounded-pill order-badge {{ suit in ['Carreaux', 'Cœur'] ? 'text-bg-danger' : 'text-bg-dark' }}">
+                    {{ loop.index }}. {{ suit }} {{ _self.suit_symbol(suit) }}
+                  </span>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <h3 class="h6 text-uppercase text-muted mb-3">
+                <i class="bi bi-123 me-1"></i>Valeurs
+              </h3>
+              <div class="d-flex flex-wrap gap-2">
+                {% for rank in orders.ranks %}
+                  <span class="badge rounded-pill text-bg-secondary order-badge">{{ loop.index }}. {{ rank }}</span>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section>
-      <h2>Main non triée</h2>
-      <ul>
-      {% for c in unsorted %}<li>{{ c }}</li>{% endfor %}
-      </ul>
-    </section>
+    <div class="row g-4">
+      <section class="col-lg-6" data-testid="unsorted-hand">
+        <div class="card panel-card h-100">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-collection me-2 text-warning"></i>Main non triée</span>
+            <span class="badge text-bg-warning-subtle text-warning-emphasis">{{ unsorted|length }} cartes</span>
+          </div>
+          <div class="card-body">
+            <ul class="hand-grid">
+              {% for c in unsorted %}
+                {{ _self.render_card(c) }}
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </section>
 
-    <section>
-      <h2>Main triée</h2>
-      <ul>
-      {% for c in sorted %}<li>{{ c }}</li>{% endfor %}
-      </ul>
-    </section>
+      <section class="col-lg-6" data-testid="sorted-hand">
+        <div class="card panel-card h-100">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-sort-down me-2 text-success"></i>Main triée</span>
+            <span class="badge text-bg-success-subtle text-success-emphasis">{{ sorted|length }} cartes</span>
+          </div>
+          <div class="card-body">
+            <ul class="hand-grid">
+              {% for c in sorted %}
+                {{ _self.render_card(c) }}
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
   </main>
+
+  <footer class="border-top bg-white py-3 mt-auto">
+    <div class="container text-center text-muted small">
+      <i class="bi bi-code-slash me-1"></i>
+      Propulsé par Symfony ·
+      <a href="/api/doc" class="text-decoration-none" target="_blank" rel="noopener">OpenAPI docs</a> ·
+      <a href="/cards" class="text-decoration-none" target="_blank" rel="noopener">GET /cards</a> (JWT)
+    </div>
+  </footer>
 {% endblock %}

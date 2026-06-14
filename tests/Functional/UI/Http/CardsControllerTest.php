@@ -4,33 +4,44 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\UI\Http;
 
+use App\Tests\Support\AuthenticatedApiClientTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class CardsControllerTest extends WebTestCase
 {
-    public function testCardsPageRendersOk(): void
+    use AuthenticatedApiClientTrait;
+
+    public function testDemoPageRendersOk(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/cards');
+        $client->request('GET', '/demo');
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'Jeu de cartes');
-        $this->assertSelectorCount(10, 'section:nth-of-type(2) ul li');
-        $this->assertSelectorCount(10, 'section:nth-of-type(3) ul li');
+        $this->assertSelectorCount(10, '[data-testid="unsorted-hand"] ul li');
+        $this->assertSelectorCount(10, '[data-testid="sorted-hand"] ul li');
     }
 
-    public function testHomeRedirectsToCards(): void
+    public function testHomeRedirectsToDemo(): void
     {
         $client = static::createClient();
         $client->request('GET', '/');
 
-        $this->assertResponseRedirects('/cards');
+        $this->assertResponseRedirects('/demo');
     }
 
-    public function testApiReturnsJson(): void
+    public function testCardsApiRequiresAuthentication(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/api/cards');
+        $client->request('GET', '/cards');
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
+    public function testCardsApiReturnsJsonWhenAuthenticated(): void
+    {
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/cards');
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'application/json');
@@ -38,8 +49,9 @@ final class CardsControllerTest extends WebTestCase
         $content = $client->getResponse()->getContent();
         self::assertIsString($content);
 
-        /** @var array{unsorted: list<string>, sorted: list<string>} $data */
+        /** @var array{count: int, unsorted: list<string>, sorted: list<string>} $data */
         $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
+        self::assertSame(10, $data['count']);
         self::assertCount(10, $data['unsorted']);
         self::assertCount(10, $data['sorted']);
     }

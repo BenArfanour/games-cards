@@ -1,0 +1,86 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Games Cards API
+            description: JWT-protected card dealing API with refresh tokens.
+            version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+            schemas:
+                LoginRequest:
+                    type: object
+                    required: [username, password]
+                    properties:
+                        username:
+                            type: string
+                            example: api_user
+                        password:
+                            type: string
+                            example: demo
+                RefreshTokenRequest:
+                    type: object
+                    required: [refresh_token]
+                    properties:
+                        refresh_token:
+                            type: string
+                LoginResponse:
+                    type: object
+                    properties:
+                        token:
+                            type: string
+                        refresh_token:
+                            type: string
+                        refresh_token_expiration:
+                            type: integer
+        security:
+            - Bearer: []
+        paths:
+            /api/login_check:
+                post:
+                    tags: [Authentication]
+                    summary: Obtain JWT access and refresh tokens
+                    security: []
+                    requestBody:
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    $ref: '#/components/schemas/LoginRequest'
+                    responses:
+                        '200':
+                            description: Authentication successful
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/LoginResponse'
+                        '401':
+                            description: Invalid credentials
+            /api/token/refresh:
+                post:
+                    tags: [Authentication]
+                    summary: Refresh JWT access token
+                    security: []
+                    requestBody:
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    $ref: '#/components/schemas/RefreshTokenRequest'
+                    responses:
+                        '200':
+                            description: New access token issued
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/LoginResponse'
+                        '401':
+                            description: Invalid or expired refresh token
+    areas:
+        default:
+            path_patterns:
+                - ^/api(?!/doc$|/login_check$|/token/refresh$)
+                - ^/cards$
