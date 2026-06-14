@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libzip-dev=1.7.3-1+b1 \
     libxml2-dev=2.9.14+dfsg-1.3~deb12u5 \
     libonig-dev=6.9.8-1 \
- && docker-php-ext-install intl zip opcache \
+    libsqlite3-dev=3.40.1-2+deb12u2 \
+ && docker-php-ext-install intl zip opcache pdo_sqlite \
  && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
