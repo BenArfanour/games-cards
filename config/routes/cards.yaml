@@ -1,0 +1,3 @@
+cards:
+  path: /cards
+  controller: App\UI\Http\CardsController
