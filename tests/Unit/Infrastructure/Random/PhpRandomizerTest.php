@@ -40,10 +40,20 @@ final class PhpRandomizerTest extends TestCase
     {
         $phpRandomizer = new PhpRandomizer(new Randomizer(new Mt19937(42)));
         $items = ['a', 'b', 'c'];
-        $shuffled = $phpRandomizer->shuffle($items);
+        $shuffled = $phpRandomizer->shuffle(['a', 'b', 'c']);
 
         self::assertCount(3, $shuffled);
         self::assertEqualsCanonicalizing(['a', 'b', 'c'], $shuffled);
+        self::assertNotSame($items, $shuffled);
+    }
+
+    public function testUniqueIndexesAreNotSequential(): void
+    {
+        $phpRandomizer = new PhpRandomizer(new Randomizer(new Mt19937(12345)));
+
+        $indexes = $phpRandomizer->uniqueIndexes(52, 10);
+
+        self::assertNotSame([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], $indexes);
     }
 
     public function testShuffleEmptyArray(): void
