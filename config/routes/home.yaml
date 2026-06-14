@@ -2,5 +2,5 @@ home:
   path: /
   controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
   defaults:
-    route: cards_index
+    route: demo_index
     permanent: false
