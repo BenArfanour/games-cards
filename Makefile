@@ -27,4 +27,4 @@ fix:
 	docker compose exec -T php ./vendor/bin/php-cs-fixer fix
 
 stan:
-	docker compose exec -T php ./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=512M
+	docker compose exec -T php ./vendor/bin/phpstan analyse -c phpstan.dist.neon --memory-limit=512M
