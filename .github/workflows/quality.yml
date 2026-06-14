@@ -31,6 +31,11 @@ jobs:
           echo "PHP container did not become ready in time"
           exit 1
 
+      - name: Prepare writable directories
+        run: |
+          docker compose exec -u root -T php mkdir -p config/jwt var
+          docker compose exec -u root -T php chown -R www-data:www-data var config/jwt
+
       - name: Install dependencies
         run: make install
 
