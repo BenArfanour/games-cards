@@ -4,53 +4,57 @@ declare(strict_types=1);
 
 namespace App\UI\Http;
 
-use App\Application\Port\HandSorterInterface;
-use App\Application\Port\OrderGeneratorInterface;
-use App\Application\Service\HandDealer;
+use App\Application\Service\HandDealingService;
+use App\UI\Http\Dto\Response\DealHandResponse;
+use Nelmio\ApiDocBundle\Attribute\Model;
+use Nelmio\ApiDocBundle\Attribute\Security;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+#[OA\Tag(name: 'Cards')]
 final class CardsController extends AbstractController
 {
     public function __construct(
-        private HandDealer $dealer,
-        private HandSorterInterface $sorter,
-        private OrderGeneratorInterface $orderGenerator,
+        private HandDealingService $handDealingService,
         private int $handSize = 10,
     ) {
     }
 
-    public function index(): Response
+    public function demo(): Response
     {
-        $data = $this->buildHandData();
+        $result = $this->handDealingService->deal($this->handSize);
+        $response = DealHandResponse::fromResult($result);
 
         return $this->render('cards/index.html.twig', [
             'orders' => [
-                'suits' => array_keys($data['orders']['suits']),
-                'ranks' => array_keys($data['orders']['ranks']),
+                'suits' => $response->suitsOrder,
+                'ranks' => $response->ranksOrder,
             ],
-            'unsorted' => $data['unsorted'],
-            'sorted' => $data['sorted'],
+            'unsorted' => $response->unsorted,
+            'sorted' => $response->sorted,
         ]);
     }
 
-    public function api(): JsonResponse
+    #[Security(name: 'Bearer')]
+    #[OA\Get(
+        path: '/cards',
+        summary: 'Deal the default hand (10 cards)',
+        description: 'Returns a random hand using the configured default size. Requires a valid JWT.',
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Hand successfully dealt',
+                attachables: [new Model(type: DealHandResponse::class)],
+            ),
+            new OA\Response(response: 401, description: 'Missing or invalid JWT'),
+        ],
+    )]
+    public function cards(): JsonResponse
     {
-        return $this->json($this->buildHandData());
-    }
+        $result = $this->handDealingService->deal($this->handSize);
 
-    /** @return array{orders: array{suits: array<string,int>, ranks: array<string,int>}, unsorted: string[], sorted: string[]} */
-    private function buildHandData(): array
-    {
-        $orders = $this->orderGenerator->generate();
-        $hand = $this->dealer->deal($this->handSize);
-        $sorted = $this->sorter->sort($hand, $orders);
-
-        return [
-            'orders' => $orders,
-            'unsorted' => array_map('strval', $hand->cards()),
-            'sorted' => array_map('strval', $sorted->cards()),
-        ];
+        return $this->json(DealHandResponse::fromResult($result));
     }
 }
