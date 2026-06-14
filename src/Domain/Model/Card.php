@@ -25,11 +25,11 @@ final class Card
 
     public function equals(self $other): bool
     {
-        return $this->suit->equals($other->suit) && $this->rank->equals($other->rank);
+        return $this->suit === $other->suit && $this->rank === $other->rank;
     }
 
     public function __toString(): string
     {
-        return sprintf('%s de %s', $this->rank(), $this->suit());
+        return sprintf('%s de %s', $this->rank->value, $this->suit->value);
     }
 }

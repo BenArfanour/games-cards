@@ -11,16 +11,17 @@ final class SuitTest extends TestCase
 {
     public function testAllAndFrom(): void
     {
-        self::assertSame(['Carreaux', 'Cœur', 'Pique', 'Trèfle'], Suit::all());
-        self::assertSame('Cœur', (string) Suit::from('Cœur'));
+        $values = array_map(static fn (Suit $suit): string => $suit->value, Suit::all());
+        self::assertSame(['Carreaux', 'Cœur', 'Pique', 'Trèfle'], $values);
+        self::assertSame(Suit::Hearts, Suit::from('Cœur'));
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\ValueError::class);
         Suit::from('Bleu');
     }
 
-    public function testEquals(): void
+    public function testEnumIdentity(): void
     {
-        self::assertTrue(Suit::from('Cœur')->equals(Suit::from('Cœur')));
-        self::assertFalse(Suit::from('Cœur')->equals(Suit::from('Pique')));
+        self::assertSame(Suit::Hearts, Suit::from('Cœur'));
+        self::assertNotSame(Suit::Hearts, Suit::Spades);
     }
 }

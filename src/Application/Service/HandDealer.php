@@ -17,8 +17,6 @@ final class HandDealer
     }
 
     /**
-     * @param positive-int $count
-     *
      * @throws \InvalidArgumentException
      */
     public function deal(int $count = 10): Hand

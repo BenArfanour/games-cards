@@ -22,7 +22,7 @@ final class Hand
 
         $seen = [];
         foreach ($cards as $card) {
-            $key = $card->suit()->name().':'.$card->rank()->label();
+            $key = $card->suit()->value.':'.$card->rank()->value;
             if (isset($seen[$key])) {
                 throw new \InvalidArgumentException('Hand contains duplicate cards.');
             }

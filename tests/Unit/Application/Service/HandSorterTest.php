@@ -21,9 +21,13 @@ final class HandSorterTest extends TestCase
             new Card(Suit::from('Carreaux'), Rank::from('Roi')),
         ]);
 
+        /** @var array{suits: array<string, int>, ranks: array<string, int>} $orders */
         $orders = [
             'suits' => ['Carreaux' => 0, 'Cœur' => 1, 'Pique' => 2, 'Trèfle' => 3],
-            'ranks' => ['As' => 0, '5' => 1, '10' => 2, '8' => 3, '6' => 4, '7' => 5, '4' => 6, '2' => 7, '3' => 8, '9' => 9, 'Dame' => 10, 'Roi' => 11, 'Valet' => 12],
+            'ranks' => [
+                'As' => 0, '2' => 7, '3' => 8, '4' => 6, '5' => 1, '6' => 4, '7' => 5,
+                '8' => 3, '9' => 9, '10' => 2, 'Valet' => 12, 'Dame' => 10, 'Roi' => 11,
+            ],
         ];
 
         $sorted = (new HandSorter())->sort($hand, $orders);
