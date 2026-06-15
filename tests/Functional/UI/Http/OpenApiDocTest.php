@@ -36,4 +36,23 @@ final class OpenApiDocTest extends WebTestCase
         self::assertArrayHasKey('/api/login_check', $data['paths']);
         self::assertArrayHasKey('/api/token/refresh', $data['paths']);
     }
+
+    public function testHandDealOpenApiDocumentsAuthorizationFailures(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/api/doc.json');
+
+        self::assertResponseIsSuccessful();
+
+        $content = $client->getResponse()->getContent();
+        self::assertIsString($content);
+
+        /** @var array{paths: array<string, array<string, array{responses: array<string, mixed>}>>} $data */
+        $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
+        $responses = $data['paths']['/api/hands/deal']['post']['responses'];
+
+        self::assertArrayHasKey('401', $responses);
+        self::assertArrayHasKey('403', $responses);
+        self::assertArrayHasKey('422', $responses);
+    }
 }
