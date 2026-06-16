@@ -72,3 +72,10 @@ when@prod:
     security:
         password_hashers:
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        providers:
+            api_users:
+                memory:
+                    users:
+                        api_user:
+                            password: '%env(API_PASSWORD_HASH)%'
+                            roles: ['ROLE_API']
