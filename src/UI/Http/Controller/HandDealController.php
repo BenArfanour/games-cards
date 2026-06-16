@@ -41,6 +41,8 @@ final class HandDealController extends AbstractController
     )]
     public function __invoke(#[MapRequestPayload] DealHandRequest $request): JsonResponse
     {
+        \assert(null !== $request->count);
+
         $result = $this->handDealingService->deal($request->count);
 
         return $this->json(DealHandResponse::fromResult($result));
