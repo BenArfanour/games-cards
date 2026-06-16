@@ -49,6 +49,7 @@ final class CardsController extends AbstractController
                 attachables: [new Model(type: DealHandResponse::class)],
             ),
             new OA\Response(response: 401, description: 'Missing or invalid JWT'),
+            new OA\Response(response: 403, description: 'Authenticated user lacks ROLE_API'),
         ],
     )]
     public function cards(): JsonResponse
