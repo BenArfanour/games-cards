@@ -27,7 +27,7 @@ final class OpenApiDocTest extends WebTestCase
         $content = $client->getResponse()->getContent();
         self::assertIsString($content);
 
-        /** @var array{openapi: string, paths: array<string, mixed>} $data */
+        /** @var array{openapi: string, paths: array<string, array<string, array{responses: array<string, mixed>}>>} $data */
         $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertArrayHasKey('paths', $data);
