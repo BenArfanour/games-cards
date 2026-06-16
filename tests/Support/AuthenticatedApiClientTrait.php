@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace App\Tests\Support;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * @phpstan-require-extends WebTestCase
+ */
 trait AuthenticatedApiClientTrait
 {
-    private function createAuthenticatedClient(): KernelBrowser
+    private function createAuthenticatedClient(string $username = 'api_user', string $password = 'demo'): KernelBrowser
     {
         $client = static::createClient();
-        $tokens = $this->login($client);
+        $tokens = $this->login($client, $username, $password);
 
         $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $tokens['token']));
 

@@ -41,6 +41,13 @@ final class ApiDtoTest extends TestCase
         self::assertGreaterThan(0, $violations->count());
     }
 
+    public function testDealHandRequestRejectsMissingCount(): void
+    {
+        $violations = $this->validator->validate(new DealHandRequest());
+
+        self::assertGreaterThan(0, $violations->count());
+    }
+
     public function testDealHandRequestRejectsOverDeckSize(): void
     {
         $violations = $this->validator->validate(new DealHandRequest(count: 53));
