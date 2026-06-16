@@ -18,11 +18,24 @@ Set on the host or in `.env.local` (never commit):
 | `APP_DEBUG` | `0` | Required |
 | `APP_SECRET` | random 32+ chars | `openssl rand -hex 32` |
 | `DATABASE_URL` | `postgresql://...` | Prod Postgres (or keep SQLite only for demos) |
-| `API_USER` | `api_user` | Login username |
-| `API_PASSWORD` | strong password | **Not** `demo` |
+| `API_USER` | `api_user` | Login username for smoke scripts |
+| `API_PASSWORD_HASH` | hashed strong password | Required by prod login; **not** plaintext |
 | `JWT_PASSPHRASE` | random string | Lexik key encryption |
 | `JWT_SECRET_KEY` | `%kernel.project_dir%/config/jwt/private.pem` | Paths on server |
 | `JWT_PUBLIC_KEY` | `%kernel.project_dir%/config/jwt/public.pem` | |
+
+Generate the production API password hash before editing `.env.local`:
+
+```bash
+docker compose exec -T php php bin/console security:hash-password --env=prod --no-debug
+```
+
+Set `API_PASSWORD_HASH` to the generated hash. Quote the value in `.env.local`
+because Symfony password hashes contain `$` characters:
+
+```dotenv
+API_PASSWORD_HASH='$2y$13$...'
+```
 
 Generate JWT keys once on the server:
 

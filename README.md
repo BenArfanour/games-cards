@@ -95,6 +95,9 @@ cp .env.example .env.local
 ```
 
 Never commit real secrets. Use `.env.local` (gitignored) for personal values.
+Production logins require `API_PASSWORD_HASH`, generated with
+`php bin/console security:hash-password --env=prod --no-debug`, rather than a
+plaintext password.
 
 For local Docker overrides, copy `docker-compose.override.dist.yml` to `docker-compose.override.yml`.
 
