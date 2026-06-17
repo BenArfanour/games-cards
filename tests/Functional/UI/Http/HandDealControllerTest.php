@@ -28,6 +28,19 @@ final class HandDealControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function testDealForbidsAuthenticatedUserWithoutApiRole(): void
+    {
+        $client = static::createClient();
+        $tokens = $this->login($client, 'basic_user', 'demo');
+        $client->setServerParameter(
+            'HTTP_Authorization',
+            sprintf('Bearer %s', $tokens['token']),
+        );
+        $client->jsonRequest('POST', '/api/hands/deal', ['count' => 5]);
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
     public function testDealWithInvalidCountReturnsValidationError(): void
     {
         $client = $this->createAuthenticatedClient();
@@ -52,6 +65,21 @@ final class HandDealControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
+    public function testDealWithMalformedJsonReturnsBadRequest(): void
+    {
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'POST',
+            '/api/hands/deal',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            '{"count":',
+        );
+
+        self::assertResponseStatusCodeSame(400);
+    }
+
     public function testDealWithValidCountReturnsHand(): void
     {
         $client = $this->createAuthenticatedClient();
@@ -71,6 +99,31 @@ final class HandDealControllerTest extends WebTestCase
         self::assertCount(5, $data['sorted']);
         self::assertCount(4, $data['suitsOrder']);
         self::assertCount(13, $data['ranksOrder']);
+    }
+
+    public function testDealWithMissingCountUsesDefaultRequestCount(): void
+    {
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'POST',
+            '/api/hands/deal',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            '{}',
+        );
+
+        self::assertResponseIsSuccessful();
+
+        $content = $client->getResponse()->getContent();
+        self::assertIsString($content);
+
+        /** @var array{count: int, unsorted: list<string>, sorted: list<string>} $data */
+        $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
+
+        self::assertSame(10, $data['count']);
+        self::assertCount(10, $data['unsorted']);
+        self::assertCount(10, $data['sorted']);
     }
 
     public function testDealWithMaxCountReturnsFullUniqueHand(): void
