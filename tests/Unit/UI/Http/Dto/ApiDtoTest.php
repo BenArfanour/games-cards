@@ -65,8 +65,11 @@ final class ApiDtoTest extends TestCase
 
     public function testLoginRequestRejectsBlankCredentials(): void
     {
-        self::assertGreaterThan(0, $this->validator->validate(new LoginRequest(username: '', password: 'demo'))->count());
-        self::assertGreaterThan(0, $this->validator->validate(new LoginRequest(username: 'api_user', password: ''))->count());
+        $blankUsernameViolations = $this->validator->validate(new LoginRequest(username: '', password: 'demo'));
+        $blankPasswordViolations = $this->validator->validate(new LoginRequest(username: 'api_user', password: ''));
+
+        self::assertGreaterThan(0, $blankUsernameViolations->count());
+        self::assertGreaterThan(0, $blankPasswordViolations->count());
     }
 
     public function testRefreshTokenRequestRejectsBlankToken(): void
