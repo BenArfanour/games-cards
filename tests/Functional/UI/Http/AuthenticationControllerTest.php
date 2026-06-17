@@ -42,12 +42,33 @@ final class AuthenticationControllerTest extends WebTestCase
         self::assertNotSame($login['refresh_token'], $refreshed['refresh_token']);
     }
 
+    public function testRefreshTokenCannotBeReused(): void
+    {
+        $client = static::createClient();
+        $login = $this->login($client);
+        $this->refreshToken($client, $login['refresh_token']);
+
+        $client->jsonRequest('POST', '/api/token/refresh', [
+            'refresh_token' => $login['refresh_token'],
+        ]);
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
     public function testRefreshWithInvalidTokenReturnsUnauthorized(): void
     {
         $client = static::createClient();
         $client->jsonRequest('POST', '/api/token/refresh', [
             'refresh_token' => 'invalid-token',
         ]);
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
+    public function testRefreshWithMissingTokenReturnsUnauthorized(): void
+    {
+        $client = static::createClient();
+        $client->jsonRequest('POST', '/api/token/refresh', []);
 
         self::assertResponseStatusCodeSame(401);
     }
