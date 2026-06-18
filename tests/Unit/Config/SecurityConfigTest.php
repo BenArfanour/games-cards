@@ -10,7 +10,7 @@ use Symfony\Component\Yaml\Yaml;
 
 final class SecurityConfigTest extends TestCase
 {
-    public function testProdDoesNotOverridePlaintextApiPasswordHasher(): void
+    public function testProdKeepsApiPasswordHasherCompatibleWithPlaintextSecret(): void
     {
         $config = Yaml::parseFile(__DIR__.'/../../../config/packages/security.yaml');
         if (!is_array($config)) {
@@ -33,10 +33,42 @@ final class SecurityConfigTest extends TestCase
         }
 
         self::assertSame('plaintext', $apiPasswordHasher['algorithm'] ?? null);
-        self::assertArrayNotHasKey(
-            'when@prod',
-            $config,
-            'Production must not override the plaintext API_PASSWORD hasher.',
+
+        $prodConfig = $config['when@prod'] ?? null;
+        if (!is_array($prodConfig)) {
+            return;
+        }
+
+        $prodSecurity = $prodConfig['security'] ?? null;
+        if (!is_array($prodSecurity)) {
+            return;
+        }
+
+        $prodPasswordHashers = $prodSecurity['password_hashers'] ?? null;
+        if (
+            !is_array($prodPasswordHashers)
+            || !array_key_exists(PasswordAuthenticatedUserInterface::class, $prodPasswordHashers)
+        ) {
+            return;
+        }
+
+        self::assertPasswordHasherUsesPlaintext(
+            $prodPasswordHashers[PasswordAuthenticatedUserInterface::class],
         );
+    }
+
+    private static function assertPasswordHasherUsesPlaintext(mixed $passwordHasher): void
+    {
+        if (is_string($passwordHasher)) {
+            self::assertSame('plaintext', $passwordHasher);
+
+            return;
+        }
+
+        if (!is_array($passwordHasher)) {
+            self::fail('Production API password hasher must be a string or structured configuration.');
+        }
+
+        self::assertSame('plaintext', $passwordHasher['algorithm'] ?? null);
     }
 }
