@@ -31,6 +31,16 @@ final class AuthenticationControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function testLoginWithMissingPasswordReturnsUnauthorized(): void
+    {
+        $client = static::createClient();
+        $client->jsonRequest('POST', '/api/login_check', [
+            'username' => 'api_user',
+        ]);
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
     public function testRefreshTokenReturnsNewAccessToken(): void
     {
         $client = static::createClient();
@@ -40,6 +50,27 @@ final class AuthenticationControllerTest extends WebTestCase
 
         self::assertNotEmpty($refreshed['token']);
         self::assertNotSame($login['refresh_token'], $refreshed['refresh_token']);
+    }
+
+    public function testRefreshTokenCannotBeReused(): void
+    {
+        $client = static::createClient();
+        $login = $this->login($client);
+
+        $this->refreshToken($client, $login['refresh_token']);
+        $client->jsonRequest('POST', '/api/token/refresh', [
+            'refresh_token' => $login['refresh_token'],
+        ]);
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
+    public function testRefreshWithoutTokenReturnsUnauthorized(): void
+    {
+        $client = static::createClient();
+        $client->jsonRequest('POST', '/api/token/refresh', []);
+
+        self::assertResponseStatusCodeSame(401);
     }
 
     public function testRefreshWithInvalidTokenReturnsUnauthorized(): void
