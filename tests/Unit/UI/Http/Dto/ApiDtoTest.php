@@ -10,12 +10,9 @@ use App\Domain\Model\Hand;
 use App\Domain\ValueObject\Rank;
 use App\Domain\ValueObject\Suit;
 use App\UI\Http\Dto\Request\DealHandRequest;
-use App\UI\Http\Dto\Request\LoginRequest;
-use App\UI\Http\Dto\Request\RefreshTokenRequest;
 use App\UI\Http\Dto\Response\DealHandResponse;
 use App\UI\Http\Dto\Response\LoginResponse;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -51,20 +48,6 @@ final class ApiDtoTest extends TestCase
         self::assertGreaterThan(0, $violations->count());
     }
 
-    public function testLoginRequestRequiresUsernameAndPassword(): void
-    {
-        $violations = $this->validator->validate(new LoginRequest(username: '', password: ''));
-
-        self::assertSame(['password', 'username'], self::violationPropertyPaths($violations));
-    }
-
-    public function testRefreshTokenRequestRequiresRefreshToken(): void
-    {
-        $violations = $this->validator->validate(new RefreshTokenRequest(refreshToken: ''));
-
-        self::assertSame(['refreshToken'], self::violationPropertyPaths($violations));
-    }
-
     public function testDealHandResponseFromResult(): void
     {
         $hand = new Hand([
@@ -98,21 +81,5 @@ final class ApiDtoTest extends TestCase
         self::assertSame('jwt-token', $response->token);
         self::assertSame('refresh-token', $response->refreshToken);
         self::assertSame(1234567890, $response->refreshTokenExpiration);
-    }
-
-    /**
-     * @return list<string>
-     */
-    private static function violationPropertyPaths(ConstraintViolationListInterface $violations): array
-    {
-        $propertyPaths = [];
-
-        foreach ($violations as $violation) {
-            $propertyPaths[] = $violation->getPropertyPath();
-        }
-
-        sort($propertyPaths);
-
-        return $propertyPaths;
     }
 }

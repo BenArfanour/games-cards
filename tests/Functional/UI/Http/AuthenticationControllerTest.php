@@ -31,6 +31,16 @@ final class AuthenticationControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function testLoginWithoutPasswordReturnsBadRequest(): void
+    {
+        $client = static::createClient();
+        $client->jsonRequest('POST', '/api/login_check', [
+            'username' => 'api_user',
+        ]);
+
+        self::assertResponseStatusCodeSame(400);
+    }
+
     public function testRefreshTokenReturnsNewAccessToken(): void
     {
         $client = static::createClient();
@@ -51,6 +61,14 @@ final class AuthenticationControllerTest extends WebTestCase
         $client->jsonRequest('POST', '/api/token/refresh', [
             'refresh_token' => $login['refresh_token'],
         ]);
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
+    public function testRefreshWithoutTokenReturnsUnauthorized(): void
+    {
+        $client = static::createClient();
+        $client->jsonRequest('POST', '/api/token/refresh', []);
 
         self::assertResponseStatusCodeSame(401);
     }
