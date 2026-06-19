@@ -12,11 +12,17 @@ final class SecurityConfigurationTest extends TestCase
 {
     public function testProductionDoesNotOverridePlaintextApiPasswordHasher(): void
     {
-        /** @var array<string, mixed> $configuration */
         $configuration = Yaml::parseFile(__DIR__.'/../../../../config/packages/security.yaml');
+        self::assertIsArray($configuration);
 
-        /** @var array<string, mixed> $passwordHasher */
-        $passwordHasher = $configuration['security']['password_hashers'][PasswordAuthenticatedUserInterface::class];
+        $security = $configuration['security'] ?? null;
+        self::assertIsArray($security);
+
+        $passwordHashers = $security['password_hashers'] ?? null;
+        self::assertIsArray($passwordHashers);
+
+        $passwordHasher = $passwordHashers[PasswordAuthenticatedUserInterface::class] ?? null;
+        self::assertIsArray($passwordHasher);
 
         self::assertSame('plaintext', $passwordHasher['algorithm']);
         self::assertArrayNotHasKey(
