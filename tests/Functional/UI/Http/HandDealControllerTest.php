@@ -81,8 +81,20 @@ final class HandDealControllerTest extends WebTestCase
         self::assertCount(13, $data['ranksOrder']);
 
         self::assertCount(5, array_unique($data['unsorted']));
-        self::assertSameCanonicalizing($data['unsorted'], $data['sorted']);
+        self::assertSameCards($data['unsorted'], $data['sorted']);
         self::assertCardsFollowSortOrder($data['sorted'], $data['suitsOrder'], $data['ranksOrder']);
+    }
+
+    /**
+     * @param list<string> $expected
+     * @param list<string> $actual
+     */
+    private static function assertSameCards(array $expected, array $actual): void
+    {
+        sort($expected);
+        sort($actual);
+
+        self::assertSame($expected, $actual);
     }
 
     /**

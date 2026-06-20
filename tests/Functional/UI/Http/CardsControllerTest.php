@@ -72,8 +72,20 @@ final class CardsControllerTest extends WebTestCase
         self::assertCount(10, $data['unsorted']);
         self::assertCount(10, $data['sorted']);
         self::assertCount(10, array_unique($data['unsorted']));
-        self::assertSameCanonicalizing($data['unsorted'], $data['sorted']);
+        self::assertSameCards($data['unsorted'], $data['sorted']);
         self::assertCardsFollowSortOrder($data['sorted'], $data['suitsOrder'], $data['ranksOrder']);
+    }
+
+    /**
+     * @param list<string> $expected
+     * @param list<string> $actual
+     */
+    private static function assertSameCards(array $expected, array $actual): void
+    {
+        sort($expected);
+        sort($actual);
+
+        self::assertSame($expected, $actual);
     }
 
     /**
