@@ -118,7 +118,7 @@ final class HandDealControllerTest extends WebTestCase
 
             $current = [$suitPositions[$suit], $rankPositions[$rank]];
             self::assertTrue(
-                $previous === null
+                null === $previous
                 || $current[0] > $previous[0]
                 || ($current[0] === $previous[0] && $current[1] >= $previous[1]),
                 sprintf('Expected sorted cards to follow suit and rank order around "%s".', $card),
