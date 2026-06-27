@@ -18,6 +18,14 @@ trait AuthenticatedApiClientTrait
         return $client;
     }
 
+    private function createClientWithBearerToken(string $token): KernelBrowser
+    {
+        $client = static::createClient();
+        $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $token));
+
+        return $client;
+    }
+
     /**
      * @return array{token: string, refresh_token: string, refresh_token_expiration?: int}
      */
