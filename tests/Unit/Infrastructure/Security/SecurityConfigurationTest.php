@@ -27,6 +27,18 @@ final class SecurityConfigurationTest extends TestCase
             ])
         );
 
+        $rootHasher = self::readConfigPath($config, [
+            'security',
+            'password_hashers',
+            'Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface',
+        ]);
+
+        self::assertSame(
+            ['algorithm' => 'plaintext'],
+            $rootHasher,
+            'The env-backed in-memory API password requires a plaintext-compatible root hasher.'
+        );
+
         $productionHasher = self::readConfigPath($config, [
             'when@prod',
             'security',
