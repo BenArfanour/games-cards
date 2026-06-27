@@ -21,7 +21,7 @@ final class HandDealControllerTest extends WebTestCase
 
     public function testDealRequiresApiRole(): void
     {
-        $client = $this->createClientWithJwtRoles(['ROLE_USER']);
+        $client = $this->createAuthenticatedClient('limited_user');
         $client->jsonRequest('POST', '/api/hands/deal', ['count' => 5]);
 
         self::assertResponseStatusCodeSame(403);

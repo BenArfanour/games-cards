@@ -40,7 +40,7 @@ final class CardsControllerTest extends WebTestCase
 
     public function testCardsApiRequiresApiRole(): void
     {
-        $client = $this->createClientWithJwtRoles(['ROLE_USER']);
+        $client = $this->createAuthenticatedClient('limited_user');
         $client->request('GET', '/cards');
 
         self::assertResponseStatusCodeSame(403);
