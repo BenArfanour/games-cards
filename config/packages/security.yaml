@@ -68,7 +68,3 @@ when@test:
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: plaintext
 
-when@prod:
-    security:
-        password_hashers:
-            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
