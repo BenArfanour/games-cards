@@ -50,7 +50,8 @@ final class SecurityConfigTest extends TestCase
         $config = Yaml::parseFile(__DIR__.'/../../../../config/packages/security.yaml');
 
         self::assertIsArray($config);
-        /** @var array<string, mixed> $config */
+
+        /* @var array<string, mixed> $config */
         return $config;
     }
 
@@ -64,7 +65,8 @@ final class SecurityConfigTest extends TestCase
         $value = self::arrayValue($config, $key);
 
         self::assertIsArray($value);
-        /** @var array<string, mixed> $value */
+
+        /* @var array<string, mixed> $value */
         return $value;
     }
 
@@ -113,7 +115,7 @@ final class SecurityConfigTest extends TestCase
 
         self::assertIsArray($hasherConfig);
 
-        /** @var array<string, mixed> $hasherConfig */
+        /* @var array<string, mixed> $hasherConfig */
         return $hasherConfig;
     }
 }
