@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\UI\Http;
 
 use App\Tests\Support\AuthenticatedApiClientTrait;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class HandDealControllerTest extends WebTestCase
@@ -34,11 +35,7 @@ final class HandDealControllerTest extends WebTestCase
         $client->jsonRequest('POST', '/api/hands/deal', ['count' => 0]);
 
         self::assertResponseStatusCodeSame(422);
-
-        $content = $client->getResponse()->getContent();
-        self::assertIsString($content);
-        self::assertStringContainsString('count', $content);
-        self::assertStringContainsString('between 1 and 52', $content);
+        $this->assertCountValidationPayload($client);
     }
 
     public function testDealWithCountOverDeckSizeReturnsValidationError(): void
@@ -47,11 +44,7 @@ final class HandDealControllerTest extends WebTestCase
         $client->jsonRequest('POST', '/api/hands/deal', ['count' => 53]);
 
         self::assertResponseStatusCodeSame(422);
-
-        $content = $client->getResponse()->getContent();
-        self::assertIsString($content);
-        self::assertStringContainsString('count', $content);
-        self::assertStringContainsString('between 1 and 52', $content);
+        $this->assertCountValidationPayload($client);
     }
 
     public function testDealWithValidCountReturnsHand(): void
@@ -95,5 +88,30 @@ final class HandDealControllerTest extends WebTestCase
         self::assertCount(52, array_unique($data['sorted']));
         self::assertCount(4, $data['suitsOrder']);
         self::assertCount(13, $data['ranksOrder']);
+    }
+
+    private function assertCountValidationPayload(KernelBrowser $client): void
+    {
+        $content = $client->getResponse()->getContent();
+        self::assertIsString($content);
+
+        $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
+        self::assertIsArray($data);
+        self::assertSame(422, $data['status'] ?? null);
+
+        $violations = $data['violations'] ?? null;
+        self::assertIsArray($violations);
+
+        $countViolations = array_values(array_filter(
+            $violations,
+            static fn (mixed $violation): bool => \is_array($violation)
+                && 'count' === ($violation['propertyPath'] ?? null),
+        ));
+
+        self::assertNotEmpty($countViolations);
+
+        $encodedViolations = json_encode($countViolations, \JSON_THROW_ON_ERROR);
+        self::assertIsString($encodedViolations);
+        self::assertStringContainsString('between 1 and 52', $encodedViolations);
     }
 }
