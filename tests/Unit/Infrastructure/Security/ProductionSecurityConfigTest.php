@@ -12,14 +12,51 @@ final class ProductionSecurityConfigTest extends TestCase
 {
     public function testProductionKeepsPlaintextHasherForRawApiPasswordSecret(): void
     {
-        /** @var array<string, mixed> $config */
         $config = Yaml::parseFile(__DIR__.'/../../../../config/packages/security.yaml');
-        $hasherConfig = $config['security']['password_hashers'][PasswordAuthenticatedUserInterface::class] ?? null;
+        self::assertIsArray($config);
+
+        $securityConfig = $config['security'] ?? null;
+        self::assertIsArray($securityConfig);
+
+        $passwordHashers = $securityConfig['password_hashers'] ?? null;
+        self::assertIsArray($passwordHashers);
+
+        $hasherConfig = $passwordHashers[PasswordAuthenticatedUserInterface::class] ?? null;
 
         self::assertIsArray($hasherConfig);
         self::assertSame('plaintext', $hasherConfig['algorithm'] ?? null);
 
-        $prodHasherConfig = $config['when@prod']['security']['password_hashers'][PasswordAuthenticatedUserInterface::class] ?? null;
+        $prodConfig = $config['when@prod'] ?? null;
+
+        if ($prodConfig === null) {
+            self::addToAssertionCount(1);
+
+            return;
+        }
+
+        self::assertIsArray($prodConfig);
+
+        $prodSecurityConfig = $prodConfig['security'] ?? null;
+
+        if ($prodSecurityConfig === null) {
+            self::addToAssertionCount(1);
+
+            return;
+        }
+
+        self::assertIsArray($prodSecurityConfig);
+
+        $prodPasswordHashers = $prodSecurityConfig['password_hashers'] ?? null;
+
+        if ($prodPasswordHashers === null) {
+            self::addToAssertionCount(1);
+
+            return;
+        }
+
+        self::assertIsArray($prodPasswordHashers);
+
+        $prodHasherConfig = $prodPasswordHashers[PasswordAuthenticatedUserInterface::class] ?? null;
 
         if ($prodHasherConfig === null) {
             self::addToAssertionCount(1);
