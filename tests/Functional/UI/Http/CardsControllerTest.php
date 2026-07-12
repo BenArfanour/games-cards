@@ -38,6 +38,15 @@ final class CardsControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function testCardsApiWithMalformedJwtReturnsUnauthorized(): void
+    {
+        $client = static::createClient();
+        $client->setServerParameter('HTTP_Authorization', 'Bearer not-a-jwt');
+        $client->request('GET', '/cards');
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
     public function testCardsApiReturnsJsonWhenAuthenticated(): void
     {
         $client = $this->createAuthenticatedClient();
@@ -49,10 +58,14 @@ final class CardsControllerTest extends WebTestCase
         $content = $client->getResponse()->getContent();
         self::assertIsString($content);
 
-        /** @var array{count: int, unsorted: list<string>, sorted: list<string>} $data */
+        /** @var array{count: int, unsorted: list<string>, sorted: list<string>, suitsOrder: list<string>, ranksOrder: list<string>} $data */
         $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
         self::assertSame(10, $data['count']);
         self::assertCount(10, $data['unsorted']);
         self::assertCount(10, $data['sorted']);
+        self::assertCount(10, array_unique($data['unsorted']));
+        self::assertCount(10, array_unique($data['sorted']));
+        self::assertCount(4, $data['suitsOrder']);
+        self::assertCount(13, $data['ranksOrder']);
     }
 }

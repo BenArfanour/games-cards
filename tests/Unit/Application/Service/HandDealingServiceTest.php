@@ -28,6 +28,10 @@ final class HandDealingServiceTest extends TestCase
             new Card(Suit::Hearts, Rank::Ace),
             new Card(Suit::Spades, Rank::King),
         ];
+        $sortedHand = new Hand([
+            $cards[1],
+            $cards[0],
+        ]);
 
         $rng = $this->createMock(RandomizerInterface::class);
         $rng->method('uniqueIndexes')->willReturn([0, 1]);
@@ -38,10 +42,14 @@ final class HandDealingServiceTest extends TestCase
         $sorter = $this->createMock(HandSorterInterface::class);
         $sorter->expects(self::once())
             ->method('sort')
-            ->willReturnCallback(static fn (Hand $hand): Hand => $hand);
+            ->with(
+                self::callback(static fn (Hand $hand): bool => $cards === $hand->cards()),
+                $orders,
+            )
+            ->willReturn($sortedHand);
 
         $orderGenerator = $this->createMock(OrderGeneratorInterface::class);
-        $orderGenerator->method('generate')->willReturn($orders);
+        $orderGenerator->expects(self::once())->method('generate')->willReturn($orders);
 
         $service = new HandDealingService(
             new HandDealer($rng, $deckFactory),
@@ -52,7 +60,7 @@ final class HandDealingServiceTest extends TestCase
         $result = $service->deal(2);
 
         self::assertSame($orders, $result->orders);
-        self::assertCount(2, $result->unsortedHand->cards());
-        self::assertCount(2, $result->sortedHand->cards());
+        self::assertSame($cards, $result->unsortedHand->cards());
+        self::assertSame($sortedHand, $result->sortedHand);
     }
 }
