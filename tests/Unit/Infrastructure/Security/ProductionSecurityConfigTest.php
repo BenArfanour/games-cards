@@ -28,7 +28,7 @@ final class ProductionSecurityConfigTest extends TestCase
 
         $prodConfig = $config['when@prod'] ?? null;
 
-        if ($prodConfig === null) {
+        if (null === $prodConfig) {
             self::addToAssertionCount(1);
 
             return;
@@ -38,7 +38,7 @@ final class ProductionSecurityConfigTest extends TestCase
 
         $prodSecurityConfig = $prodConfig['security'] ?? null;
 
-        if ($prodSecurityConfig === null) {
+        if (null === $prodSecurityConfig) {
             self::addToAssertionCount(1);
 
             return;
@@ -48,7 +48,7 @@ final class ProductionSecurityConfigTest extends TestCase
 
         $prodPasswordHashers = $prodSecurityConfig['password_hashers'] ?? null;
 
-        if ($prodPasswordHashers === null) {
+        if (null === $prodPasswordHashers) {
             self::addToAssertionCount(1);
 
             return;
@@ -58,7 +58,7 @@ final class ProductionSecurityConfigTest extends TestCase
 
         $prodHasherConfig = $prodPasswordHashers[PasswordAuthenticatedUserInterface::class] ?? null;
 
-        if ($prodHasherConfig === null) {
+        if (null === $prodHasherConfig) {
             self::addToAssertionCount(1);
 
             return;
