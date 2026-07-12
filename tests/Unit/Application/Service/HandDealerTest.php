@@ -44,4 +44,37 @@ final class HandDealerTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $dealer->deal(0);
     }
+
+    public function testDealWithNegativeCountThrows(): void
+    {
+        $dealer = new HandDealer(
+            $this->createMock(RandomizerInterface::class),
+            $this->createMock(DeckFactoryInterface::class),
+        );
+
+        $this->expectException(\InvalidArgumentException::class);
+        $dealer->deal(-1);
+    }
+
+    public function testDealWithCountGreaterThanDeckThrows(): void
+    {
+        $rng = $this->createMock(RandomizerInterface::class);
+        $rng
+            ->expects(self::once())
+            ->method('uniqueIndexes')
+            ->with(3, 4)
+            ->willThrowException(new \InvalidArgumentException('Cannot pick more cards than the deck contains.'));
+
+        $deckFactory = $this->createMock(DeckFactoryInterface::class);
+        $deckFactory->method('standardDeck')->willReturn([
+            new Card(Suit::from('Cœur'), Rank::from('As')),
+            new Card(Suit::from('Pique'), Rank::from('Roi')),
+            new Card(Suit::from('Trèfle'), Rank::from('Dame')),
+        ]);
+
+        $dealer = new HandDealer($rng, $deckFactory);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $dealer->deal(4);
+    }
 }
