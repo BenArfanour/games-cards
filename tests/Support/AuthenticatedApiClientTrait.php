@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Support;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * @phpstan-require-extends WebTestCase
+ */
 trait AuthenticatedApiClientTrait
 {
     private function createAuthenticatedClient(): KernelBrowser
