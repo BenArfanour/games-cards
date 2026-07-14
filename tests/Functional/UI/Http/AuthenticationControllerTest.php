@@ -19,7 +19,7 @@ final class AuthenticationControllerTest extends WebTestCase
         self::assertNotEmpty($data['token']);
         self::assertNotEmpty($data['refresh_token']);
         self::assertArrayHasKey('refresh_token_expiration', $data);
-        self::assertIsInt($data['refresh_token_expiration']);
+        self::assertIsInt($data['refresh_token_expiration'] ?? null);
     }
 
     public function testLoginWithInvalidCredentialsReturnsUnauthorized(): void
