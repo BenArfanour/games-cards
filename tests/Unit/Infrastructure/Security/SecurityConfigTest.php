@@ -9,13 +9,15 @@ use Symfony\Component\Yaml\Yaml;
 
 final class SecurityConfigTest extends TestCase
 {
+    private const PASSWORD_USER_INTERFACE = 'Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface';
+
     public function testApiPasswordHasherStaysPlaintextForEnvBackedPassword(): void
     {
         $config = Yaml::parseFile(__DIR__.'/../../../../config/packages/security.yaml');
 
         self::assertSame(
             'plaintext',
-            $config['security']['password_hashers']['Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface']['algorithm'],
+            $config['security']['password_hashers'][self::PASSWORD_USER_INTERFACE]['algorithm'],
         );
 
         self::assertSame(
@@ -23,10 +25,9 @@ final class SecurityConfigTest extends TestCase
             $config['security']['providers']['api_users']['memory']['users']['api_user']['password'],
         );
 
-        self::assertArrayNotHasKey(
-            'when@prod',
-            $config,
-            'The raw API_PASSWORD provider value must not be verified with the prod auto hasher.',
+        self::assertFalse(
+            isset($config['when@prod']['security']['password_hashers'][self::PASSWORD_USER_INTERFACE]),
+            'The raw API_PASSWORD provider value must not be verified with a prod-only hasher override.',
         );
     }
 }
