@@ -34,6 +34,23 @@ final class ApiDtoTest extends TestCase
         self::assertCount(0, $violations);
     }
 
+    /**
+     * @return iterable<string, array{int}>
+     */
+    public static function validDealHandBoundaryCounts(): iterable
+    {
+        yield 'minimum' => [1];
+        yield 'maximum' => [52];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('validDealHandBoundaryCounts')]
+    public function testDealHandRequestAcceptsBoundaryCounts(int $count): void
+    {
+        $violations = $this->validator->validate(new DealHandRequest(count: $count));
+
+        self::assertCount(0, $violations);
+    }
+
     public function testDealHandRequestRejectsZero(): void
     {
         $violations = $this->validator->validate(new DealHandRequest(count: 0));
