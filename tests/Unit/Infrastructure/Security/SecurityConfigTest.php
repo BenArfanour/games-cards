@@ -47,13 +47,13 @@ final class SecurityConfigTest extends TestCase
             self::fail('Security config must parse to an array.');
         }
 
-        /** @var array<string, mixed> $config */
+        /* @var array<string, mixed> $config */
         return $config;
     }
 
     /**
      * @param array<string, mixed> $data
-     * @param list<string>        $path
+     * @param list<string>         $path
      */
     private static function nestedValue(array $data, array $path): mixed
     {
