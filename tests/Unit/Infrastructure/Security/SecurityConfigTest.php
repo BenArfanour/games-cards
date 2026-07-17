@@ -47,8 +47,27 @@ final class SecurityConfigTest extends TestCase
             self::fail('Security config must parse to an array.');
         }
 
-        /* @var array<string, mixed> $config */
-        return $config;
+        return self::requireStringKeys($config);
+    }
+
+    /**
+     * @param array<mixed, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
+    private static function requireStringKeys(array $data): array
+    {
+        $result = [];
+
+        foreach ($data as $key => $value) {
+            if (!is_string($key)) {
+                self::fail('Security config root keys must be strings.');
+            }
+
+            $result[$key] = $value;
+        }
+
+        return $result;
     }
 
     /**
