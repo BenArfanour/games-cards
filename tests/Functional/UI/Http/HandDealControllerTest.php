@@ -27,6 +27,14 @@ final class HandDealControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
+    public function testDealForbidsAuthenticatedUserWithoutApiRole(): void
+    {
+        $client = $this->createAuthenticatedClient('limited_user');
+        $client->jsonRequest('POST', '/api/hands/deal', ['count' => 5]);
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
     public function testDealWithValidCountReturnsHand(): void
     {
         $client = $this->createAuthenticatedClient();
