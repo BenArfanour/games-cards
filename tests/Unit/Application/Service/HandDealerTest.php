@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Application\Service;
 
 use App\Application\Port\DeckFactoryInterface;
 use App\Application\Port\RandomizerInterface;
+use App\Application\Service\DeckFactory;
 use App\Application\Service\HandDealer;
 use App\Domain\Model\Card;
 use App\Domain\Model\Hand;
@@ -43,5 +44,25 @@ final class HandDealerTest extends TestCase
 
         $this->expectException(\InvalidArgumentException::class);
         $dealer->deal(0);
+    }
+
+    public function testDealWithCountGreaterThanDeckThrows(): void
+    {
+        $rng = $this->createMock(RandomizerInterface::class);
+        $rng->expects(self::once())
+            ->method('uniqueIndexes')
+            ->with(52, 53)
+            ->willThrowException(new \InvalidArgumentException('Cannot pick 53 unique indexes from population of 52.'));
+
+        $deckFactory = $this->createMock(DeckFactoryInterface::class);
+        $deckFactory->method('standardDeck')->willReturn((new DeckFactory())->standardDeck());
+
+        $dealer = new HandDealer(
+            $rng,
+            $deckFactory,
+        );
+
+        $this->expectException(\InvalidArgumentException::class);
+        $dealer->deal(53);
     }
 }

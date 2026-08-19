@@ -38,6 +38,23 @@ final class CardsControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function testCardsApiRejectsMalformedBearerToken(): void
+    {
+        $client = static::createClient();
+        $client->setServerParameter('HTTP_Authorization', 'Bearer not-a-jwt');
+        $client->request('GET', '/cards');
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
+    public function testCardsApiRejectsAuthenticatedUserWithoutApiRole(): void
+    {
+        $client = $this->createAuthenticatedClient('limited_user');
+        $client->request('GET', '/cards');
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
     public function testCardsApiReturnsJsonWhenAuthenticated(): void
     {
         $client = $this->createAuthenticatedClient();
@@ -54,5 +71,7 @@ final class CardsControllerTest extends WebTestCase
         self::assertSame(10, $data['count']);
         self::assertCount(10, $data['unsorted']);
         self::assertCount(10, $data['sorted']);
+        self::assertSame($data['unsorted'], array_values(array_unique($data['unsorted'])));
+        self::assertSame($data['sorted'], array_values(array_unique($data['sorted'])));
     }
 }
