@@ -12,10 +12,7 @@ use App\Domain\Model\Card;
 use App\Domain\Model\Hand;
 use App\Domain\ValueObject\Rank;
 use App\Domain\ValueObject\Suit;
-use App\Infrastructure\Random\PhpRandomizer;
 use PHPUnit\Framework\TestCase;
-use Random\Engine\Mt19937;
-use Random\Randomizer;
 
 final class HandDealerTest extends TestCase
 {
@@ -51,9 +48,18 @@ final class HandDealerTest extends TestCase
 
     public function testDealWithCountGreaterThanDeckThrows(): void
     {
+        $rng = $this->createMock(RandomizerInterface::class);
+        $rng->expects(self::once())
+            ->method('uniqueIndexes')
+            ->with(52, 53)
+            ->willThrowException(new \InvalidArgumentException('Cannot pick 53 unique indexes from population of 52.'));
+
+        $deckFactory = $this->createMock(DeckFactoryInterface::class);
+        $deckFactory->method('standardDeck')->willReturn((new DeckFactory())->standardDeck());
+
         $dealer = new HandDealer(
-            new PhpRandomizer(new Randomizer(new Mt19937(1))),
-            new DeckFactory(),
+            $rng,
+            $deckFactory,
         );
 
         $this->expectException(\InvalidArgumentException::class);

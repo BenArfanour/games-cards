@@ -8,10 +8,7 @@ use App\Application\Port\RandomizerInterface;
 use App\Application\Service\RandomOrderGenerator;
 use App\Domain\ValueObject\Rank;
 use App\Domain\ValueObject\Suit;
-use App\Infrastructure\Random\PhpRandomizer;
 use PHPUnit\Framework\TestCase;
-use Random\Engine\Mt19937;
-use Random\Randomizer;
 
 final class RandomOrderGeneratorTest extends TestCase
 {
@@ -32,7 +29,12 @@ final class RandomOrderGeneratorTest extends TestCase
 
     public function testGenerateReturnsCompleteSuitAndRankPermutationMaps(): void
     {
-        $generator = new RandomOrderGenerator(new PhpRandomizer(new Randomizer(new Mt19937(12345))));
+        $rng = $this->createMock(RandomizerInterface::class);
+        $rng->expects(self::exactly(2))
+            ->method('shuffle')
+            ->willReturnCallback(static fn (array $items): array => array_reverse($items));
+
+        $generator = new RandomOrderGenerator($rng);
 
         $orders = $generator->generate();
 
