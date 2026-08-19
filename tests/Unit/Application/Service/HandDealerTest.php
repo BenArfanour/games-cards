@@ -6,12 +6,16 @@ namespace App\Tests\Unit\Application\Service;
 
 use App\Application\Port\DeckFactoryInterface;
 use App\Application\Port\RandomizerInterface;
+use App\Application\Service\DeckFactory;
 use App\Application\Service\HandDealer;
 use App\Domain\Model\Card;
 use App\Domain\Model\Hand;
 use App\Domain\ValueObject\Rank;
 use App\Domain\ValueObject\Suit;
+use App\Infrastructure\Random\PhpRandomizer;
 use PHPUnit\Framework\TestCase;
+use Random\Engine\Mt19937;
+use Random\Randomizer;
 
 final class HandDealerTest extends TestCase
 {
@@ -43,5 +47,16 @@ final class HandDealerTest extends TestCase
 
         $this->expectException(\InvalidArgumentException::class);
         $dealer->deal(0);
+    }
+
+    public function testDealWithCountGreaterThanDeckThrows(): void
+    {
+        $dealer = new HandDealer(
+            new PhpRandomizer(new Randomizer(new Mt19937(1))),
+            new DeckFactory(),
+        );
+
+        $this->expectException(\InvalidArgumentException::class);
+        $dealer->deal(53);
     }
 }

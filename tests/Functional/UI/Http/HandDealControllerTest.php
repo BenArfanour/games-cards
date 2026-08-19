@@ -19,6 +19,15 @@ final class HandDealControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function testDealRejectsMalformedBearerToken(): void
+    {
+        $client = static::createClient();
+        $client->setServerParameter('HTTP_Authorization', 'Bearer not-a-jwt');
+        $client->jsonRequest('POST', '/api/hands/deal', ['count' => 5]);
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
     public function testDealRejectsAuthenticatedUserWithoutApiRole(): void
     {
         $client = $this->createAuthenticatedClient('limited_user');
@@ -73,7 +82,29 @@ final class HandDealControllerTest extends WebTestCase
         self::assertSame(5, $data['count']);
         self::assertCount(5, $data['unsorted']);
         self::assertCount(5, $data['sorted']);
+        self::assertSame($data['unsorted'], array_values(array_unique($data['unsorted'])));
+        self::assertSame($data['sorted'], array_values(array_unique($data['sorted'])));
         self::assertCount(4, $data['suitsOrder']);
         self::assertCount(13, $data['ranksOrder']);
+    }
+
+    public function testDealCanReturnFullDeckWithoutDuplicates(): void
+    {
+        $client = $this->createAuthenticatedClient();
+        $client->jsonRequest('POST', '/api/hands/deal', ['count' => 52]);
+
+        self::assertResponseIsSuccessful();
+
+        $content = $client->getResponse()->getContent();
+        self::assertIsString($content);
+
+        /** @var array{count: int, unsorted: list<string>, sorted: list<string>} $data */
+        $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
+
+        self::assertSame(52, $data['count']);
+        self::assertCount(52, $data['unsorted']);
+        self::assertCount(52, $data['sorted']);
+        self::assertSame($data['unsorted'], array_values(array_unique($data['unsorted'])));
+        self::assertSame($data['sorted'], array_values(array_unique($data['sorted'])));
     }
 }
