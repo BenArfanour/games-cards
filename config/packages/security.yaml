@@ -67,6 +67,13 @@ when@test:
         password_hashers:
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: plaintext
+        providers:
+            api_users:
+                memory:
+                    users:
+                        limited_user:
+                            password: demo
+                            roles: ['ROLE_USER']
 
 when@prod:
     security:
