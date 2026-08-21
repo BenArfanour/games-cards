@@ -21,6 +21,18 @@ final class PhpRandomizerTest extends TestCase
         self::assertCount(10, array_unique($indexes));
     }
 
+    public function testUniqueIndexesAreWithinRange(): void
+    {
+        $phpRandomizer = new PhpRandomizer(new Randomizer(new Mt19937(12345)));
+
+        $indexes = $phpRandomizer->uniqueIndexes(52, 10);
+
+        foreach ($indexes as $index) {
+            self::assertGreaterThanOrEqual(0, $index);
+            self::assertLessThan(52, $index);
+        }
+    }
+
     public function testUniqueIndexesThrowsWhenCountExceedsPopulation(): void
     {
         $phpRandomizer = new PhpRandomizer(new Randomizer(new Mt19937(1)));
