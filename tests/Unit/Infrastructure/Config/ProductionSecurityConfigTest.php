@@ -18,8 +18,8 @@ final class ProductionSecurityConfigTest extends TestCase
             $config['security']['password_hashers']['Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface'],
         );
         self::assertArrayNotHasKey(
-            'when@prod',
-            $config,
+            'password_hashers',
+            $config['when@prod']['security'] ?? [],
             'API_PASSWORD is provided as plaintext, so prod must not expect a pre-hashed memory user password.',
         );
     }
