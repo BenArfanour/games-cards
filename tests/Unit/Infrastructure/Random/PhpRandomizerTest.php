@@ -21,6 +21,17 @@ final class PhpRandomizerTest extends TestCase
         self::assertCount(10, array_unique($indexes));
     }
 
+    public function testUniqueIndexesReturnsEveryIndexWhenCountMatchesPopulation(): void
+    {
+        $phpRandomizer = new PhpRandomizer(new Randomizer(new Mt19937(12345)));
+
+        $indexes = $phpRandomizer->uniqueIndexes(5, 5);
+
+        self::assertCount(5, $indexes);
+        self::assertEqualsCanonicalizing([0, 1, 2, 3, 4], $indexes);
+        self::assertContainsOnly('int', $indexes);
+    }
+
     public function testUniqueIndexesThrowsWhenCountExceedsPopulation(): void
     {
         $phpRandomizer = new PhpRandomizer(new Randomizer(new Mt19937(1)));
