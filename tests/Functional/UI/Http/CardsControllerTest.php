@@ -71,5 +71,8 @@ final class CardsControllerTest extends WebTestCase
         self::assertSame(10, $data['count']);
         self::assertCount(10, $data['unsorted']);
         self::assertCount(10, $data['sorted']);
+        self::assertCount(10, array_unique($data['unsorted']));
+        self::assertCount(10, array_unique($data['sorted']));
+        self::assertEqualsCanonicalizing($data['unsorted'], $data['sorted']);
     }
 }
