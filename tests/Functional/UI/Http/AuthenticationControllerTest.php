@@ -31,6 +31,34 @@ final class AuthenticationControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function testLoginWithMissingUsernameReturnsBadRequest(): void
+    {
+        $client = static::createClient();
+        $client->jsonRequest('POST', '/api/login_check', [
+            'password' => 'demo',
+        ]);
+
+        self::assertResponseStatusCodeSame(400);
+    }
+
+    public function testLoginWithMalformedJsonReturnsBadRequest(): void
+    {
+        $client = static::createClient();
+        $client->request(
+            'POST',
+            '/api/login_check',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_ACCEPT' => 'application/json',
+            ],
+            '{"username":'
+        );
+
+        self::assertResponseStatusCodeSame(400);
+    }
+
     public function testRefreshTokenReturnsNewAccessToken(): void
     {
         $client = static::createClient();
