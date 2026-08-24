@@ -38,7 +38,7 @@ final class ProductionSecurityConfigTest extends TestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<mixed, mixed>
      */
     private function parseSecurityConfig(): array
     {
@@ -48,14 +48,13 @@ final class ProductionSecurityConfigTest extends TestCase
             self::fail('Security config must parse to an array.');
         }
 
-        /* @var array<string, mixed> $securityConfig */
         return $securityConfig;
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param array<mixed, mixed> $config
      *
-     * @return array<string, mixed>
+     * @return array<mixed, mixed>
      */
     private function nestedArray(array $config, string ...$keys): array
     {
@@ -65,12 +64,11 @@ final class ProductionSecurityConfigTest extends TestCase
             self::fail(sprintf('Expected "%s" to be an array.', implode('.', $keys)));
         }
 
-        /* @var array<string, mixed> $value */
         return $value;
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param array<mixed, mixed> $config
      */
     private function nestedValue(array $config, string ...$keys): mixed
     {
