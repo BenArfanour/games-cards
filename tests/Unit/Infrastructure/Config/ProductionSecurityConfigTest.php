@@ -48,7 +48,7 @@ final class ProductionSecurityConfigTest extends TestCase
             self::fail('Security config must parse to an array.');
         }
 
-        /** @var array<string, mixed> $securityConfig */
+        /* @var array<string, mixed> $securityConfig */
         return $securityConfig;
     }
 
@@ -65,7 +65,7 @@ final class ProductionSecurityConfigTest extends TestCase
             self::fail(sprintf('Expected "%s" to be an array.', implode('.', $keys)));
         }
 
-        /** @var array<string, mixed> $value */
+        /* @var array<string, mixed> $value */
         return $value;
     }
 
