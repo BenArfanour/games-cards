@@ -21,6 +21,18 @@ final class PhpRandomizerTest extends TestCase
         self::assertCount(10, array_unique($indexes));
     }
 
+    public function testUniqueIndexesReturnsFullShuffledPopulation(): void
+    {
+        $phpRandomizer = new PhpRandomizer(new Randomizer(new Mt19937(12345)));
+        $expectedIndexes = range(0, 51);
+
+        $indexes = $phpRandomizer->uniqueIndexes(52, 52);
+
+        self::assertCount(52, $indexes);
+        self::assertEqualsCanonicalizing($expectedIndexes, $indexes);
+        self::assertNotSame($expectedIndexes, $indexes);
+    }
+
     public function testUniqueIndexesThrowsWhenCountExceedsPopulation(): void
     {
         $phpRandomizer = new PhpRandomizer(new Randomizer(new Mt19937(1)));
