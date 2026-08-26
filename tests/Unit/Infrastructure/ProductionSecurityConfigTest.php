@@ -12,7 +12,7 @@ final class ProductionSecurityConfigTest extends TestCase
 {
     public function testProductionDoesNotOverrideApiPasswordHasher(): void
     {
-        $config = Yaml::parseFile(__DIR__ . '/../../../config/packages/security.yaml');
+        $config = Yaml::parseFile(__DIR__.'/../../../config/packages/security.yaml');
 
         self::assertIsArray($config);
 
