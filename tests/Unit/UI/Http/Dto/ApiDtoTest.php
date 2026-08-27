@@ -34,6 +34,13 @@ final class ApiDtoTest extends TestCase
         self::assertCount(0, $violations);
     }
 
+    public function testDealHandRequestAcceptsDeckSizeLimit(): void
+    {
+        $violations = $this->validator->validate(new DealHandRequest(count: 52));
+
+        self::assertCount(0, $violations);
+    }
+
     public function testDealHandRequestRejectsZero(): void
     {
         $violations = $this->validator->validate(new DealHandRequest(count: 0));
