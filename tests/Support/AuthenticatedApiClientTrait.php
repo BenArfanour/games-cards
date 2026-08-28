@@ -41,7 +41,7 @@ trait AuthenticatedApiClientTrait
         $content = $client->getResponse()->getContent();
         self::assertIsString($content);
 
-        /** @var array{token: string, refresh_token: string, refresh_token_expiration?: int} $data */
+        /** @var array{token: string, refresh_token: string, refresh_token_expiration: int} $data */
         $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertArrayHasKey('token', $data);
@@ -65,7 +65,7 @@ trait AuthenticatedApiClientTrait
         $content = $client->getResponse()->getContent();
         self::assertIsString($content);
 
-        /** @var array{token: string, refresh_token: string, refresh_token_expiration?: int} $data */
+        /** @var array{token: string, refresh_token: string, refresh_token_expiration: int} $data */
         $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertArrayHasKey('token', $data);
