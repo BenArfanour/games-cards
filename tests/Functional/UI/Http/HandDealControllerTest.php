@@ -19,6 +19,14 @@ final class HandDealControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function testDealRejectsMalformedBearerToken(): void
+    {
+        $client = $this->createClientWithBearerToken('not-a-jwt');
+        $client->jsonRequest('POST', '/api/hands/deal', ['count' => 5]);
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
     public function testDealRejectsAuthenticatedUserWithoutApiRole(): void
     {
         $client = $this->createAuthenticatedClient('limited_user');
