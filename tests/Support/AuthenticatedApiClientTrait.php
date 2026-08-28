@@ -8,18 +8,26 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 trait AuthenticatedApiClientTrait
 {
-    private function createAuthenticatedClient(): KernelBrowser
+    private function createAuthenticatedClient(string $username = 'api_user', string $password = 'demo'): KernelBrowser
     {
         $client = static::createClient();
-        $tokens = $this->login($client);
+        $tokens = $this->login($client, $username, $password);
 
         $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $tokens['token']));
 
         return $client;
     }
 
+    private function createClientWithBearerToken(string $token): KernelBrowser
+    {
+        $client = static::createClient();
+        $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $token));
+
+        return $client;
+    }
+
     /**
-     * @return array{token: string, refresh_token: string, refresh_token_expiration?: int}
+     * @return array{token: string, refresh_token: string, refresh_token_expiration: int}
      */
     private function login(KernelBrowser $client, string $username = 'api_user', string $password = 'demo'): array
     {
@@ -33,17 +41,18 @@ trait AuthenticatedApiClientTrait
         $content = $client->getResponse()->getContent();
         self::assertIsString($content);
 
-        /** @var array{token: string, refresh_token: string, refresh_token_expiration?: int} $data */
+        /** @var array{token: string, refresh_token: string, refresh_token_expiration: int} $data */
         $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertArrayHasKey('token', $data);
         self::assertArrayHasKey('refresh_token', $data);
+        self::assertArrayHasKey('refresh_token_expiration', $data);
 
         return $data;
     }
 
     /**
-     * @return array{token: string, refresh_token: string, refresh_token_expiration?: int}
+     * @return array{token: string, refresh_token: string, refresh_token_expiration: int}
      */
     private function refreshToken(KernelBrowser $client, string $refreshToken): array
     {
@@ -56,11 +65,12 @@ trait AuthenticatedApiClientTrait
         $content = $client->getResponse()->getContent();
         self::assertIsString($content);
 
-        /** @var array{token: string, refresh_token: string, refresh_token_expiration?: int} $data */
+        /** @var array{token: string, refresh_token: string, refresh_token_expiration: int} $data */
         $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertArrayHasKey('token', $data);
         self::assertArrayHasKey('refresh_token', $data);
+        self::assertArrayHasKey('refresh_token_expiration', $data);
 
         return $data;
     }
