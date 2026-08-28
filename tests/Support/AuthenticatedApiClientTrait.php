@@ -27,7 +27,7 @@ trait AuthenticatedApiClientTrait
     }
 
     /**
-     * @return array{token: string, refresh_token: string, refresh_token_expiration?: int}
+     * @return array{token: string, refresh_token: string, refresh_token_expiration: int}
      */
     private function login(KernelBrowser $client, string $username = 'api_user', string $password = 'demo'): array
     {
@@ -46,12 +46,13 @@ trait AuthenticatedApiClientTrait
 
         self::assertArrayHasKey('token', $data);
         self::assertArrayHasKey('refresh_token', $data);
+        self::assertArrayHasKey('refresh_token_expiration', $data);
 
         return $data;
     }
 
     /**
-     * @return array{token: string, refresh_token: string, refresh_token_expiration?: int}
+     * @return array{token: string, refresh_token: string, refresh_token_expiration: int}
      */
     private function refreshToken(KernelBrowser $client, string $refreshToken): array
     {
@@ -69,6 +70,7 @@ trait AuthenticatedApiClientTrait
 
         self::assertArrayHasKey('token', $data);
         self::assertArrayHasKey('refresh_token', $data);
+        self::assertArrayHasKey('refresh_token_expiration', $data);
 
         return $data;
     }
