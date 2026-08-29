@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Unit\Config;
+
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Yaml\Yaml;
+
+final class ProductionSecurityConfigTest extends TestCase
+{
+    public function testProductionKeepsPlaintextHasherForEnvBackedApiUser(): void
+    {
+        $config = Yaml::parseFile(__DIR__.'/../../../config/packages/security.yaml');
+
+        self::assertSame(
+            'plaintext',
+            $config['security']['password_hashers']['Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface']['algorithm'],
+        );
+        self::assertSame(
+            '%env(API_PASSWORD)%',
+            $config['security']['providers']['api_users']['memory']['users']['api_user']['password'],
+        );
+        self::assertArrayNotHasKey(
+            'when@prod',
+            $config,
+            'The env-backed API user stores a raw password, so prod must not override the plaintext hasher.',
+        );
+    }
+}
