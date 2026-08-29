@@ -35,6 +35,14 @@ final class HandDealControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
+    public function testDealWithCountOverDeckSizeReturnsValidationError(): void
+    {
+        $client = $this->createAuthenticatedClient();
+        $client->jsonRequest('POST', '/api/hands/deal', ['count' => 53]);
+
+        self::assertResponseStatusCodeSame(422);
+    }
+
     public function testDealWithValidCountReturnsHand(): void
     {
         $client = $this->createAuthenticatedClient();
