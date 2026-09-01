@@ -19,12 +19,29 @@ final class HandDealControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function testDealRejectsInvalidBearerToken(): void
+    {
+        $client = static::createClient();
+        $client->setServerParameter('HTTP_Authorization', 'Bearer invalid.jwt.token');
+        $client->jsonRequest('POST', '/api/hands/deal', ['count' => 5]);
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
     public function testDealWithInvalidCountReturnsValidationError(): void
     {
         $client = $this->createAuthenticatedClient();
         $client->jsonRequest('POST', '/api/hands/deal', ['count' => 0]);
 
         self::assertResponseStatusCodeSame(422);
+    }
+
+    public function testDealWithAuthenticatedUserMissingApiRoleReturnsForbidden(): void
+    {
+        $client = $this->createAuthenticatedClient('limited_user');
+        $client->jsonRequest('POST', '/api/hands/deal', ['count' => 5]);
+
+        self::assertResponseStatusCodeSame(403);
     }
 
     public function testDealWithValidCountReturnsHand(): void
