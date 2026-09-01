@@ -38,6 +38,15 @@ final class CardsControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function testCardsApiRejectsInvalidBearerToken(): void
+    {
+        $client = static::createClient();
+        $client->setServerParameter('HTTP_Authorization', 'Bearer invalid.jwt.token');
+        $client->request('GET', '/cards');
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
     public function testCardsApiWithAuthenticatedUserMissingApiRoleReturnsForbidden(): void
     {
         $client = $this->createAuthenticatedClient('limited_user');
