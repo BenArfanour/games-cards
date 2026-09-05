@@ -8,10 +8,10 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 trait AuthenticatedApiClientTrait
 {
-    private function createAuthenticatedClient(): KernelBrowser
+    private function createAuthenticatedClient(string $username = 'api_user', string $password = 'demo'): KernelBrowser
     {
         $client = static::createClient();
-        $tokens = $this->login($client);
+        $tokens = $this->login($client, $username, $password);
 
         $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $tokens['token']));
 
