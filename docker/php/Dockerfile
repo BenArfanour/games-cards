@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip=6.0-28 \
     libicu-dev=72.1-3+deb12u1 \
     libzip-dev=1.7.3-1+b1 \
-    libxml2-dev=2.9.14+dfsg-1.3~deb12u5 \
+    libxml2-dev=2.9.14+dfsg-1.3~deb12u6 \
     libonig-dev=6.9.8-1 \
     libsqlite3-dev=3.40.1-2+deb12u2 \
  && docker-php-ext-install intl zip opcache pdo_sqlite \
