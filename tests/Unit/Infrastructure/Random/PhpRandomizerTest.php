@@ -19,6 +19,28 @@ final class PhpRandomizerTest extends TestCase
 
         self::assertCount(10, $indexes);
         self::assertCount(10, array_unique($indexes));
+        self::assertContainsOnly('int', $indexes);
+        foreach ($indexes as $index) {
+            self::assertGreaterThanOrEqual(0, $index);
+            self::assertLessThan(52, $index);
+        }
+    }
+
+    public function testUniqueIndexesCanReturnEntirePopulation(): void
+    {
+        $phpRandomizer = new PhpRandomizer(new Randomizer(new Mt19937(12345)));
+
+        $indexes = $phpRandomizer->uniqueIndexes(52, 52);
+        sort($indexes);
+
+        self::assertSame(range(0, 51), $indexes);
+    }
+
+    public function testUniqueIndexesCanReturnSingleItemPopulation(): void
+    {
+        $phpRandomizer = new PhpRandomizer(new Randomizer(new Mt19937(1)));
+
+        self::assertSame([0], $phpRandomizer->uniqueIndexes(1, 1));
     }
 
     public function testUniqueIndexesThrowsWhenCountExceedsPopulation(): void
