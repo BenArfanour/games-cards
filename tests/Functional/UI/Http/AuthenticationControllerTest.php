@@ -18,6 +18,10 @@ final class AuthenticationControllerTest extends WebTestCase
 
         self::assertNotEmpty($data['token']);
         self::assertNotEmpty($data['refresh_token']);
+        self::assertArrayHasKey('refresh_token_expiration', $data);
+        $expiration = $data['refresh_token_expiration'] ?? null;
+        self::assertIsInt($expiration);
+        self::assertGreaterThan(time(), $expiration);
     }
 
     public function testLoginWithInvalidCredentialsReturnsUnauthorized(): void
@@ -40,6 +44,35 @@ final class AuthenticationControllerTest extends WebTestCase
 
         self::assertNotEmpty($refreshed['token']);
         self::assertNotSame($login['refresh_token'], $refreshed['refresh_token']);
+        self::assertArrayHasKey('refresh_token_expiration', $refreshed);
+        $expiration = $refreshed['refresh_token_expiration'] ?? null;
+        self::assertIsInt($expiration);
+        self::assertGreaterThan(time(), $expiration);
+    }
+
+    public function testRefreshedAccessTokenWorksOnProtectedRoute(): void
+    {
+        $client = static::createClient();
+        $login = $this->login($client);
+        $refreshed = $this->refreshToken($client, $login['refresh_token']);
+
+        $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $refreshed['token']));
+        $client->request('GET', '/cards');
+
+        self::assertResponseIsSuccessful();
+    }
+
+    public function testReusedRefreshTokenReturnsUnauthorized(): void
+    {
+        $client = static::createClient();
+        $login = $this->login($client);
+        $this->refreshToken($client, $login['refresh_token']);
+
+        $client->jsonRequest('POST', '/api/token/refresh', [
+            'refresh_token' => $login['refresh_token'],
+        ]);
+
+        self::assertResponseStatusCodeSame(401);
     }
 
     public function testRefreshWithInvalidTokenReturnsUnauthorized(): void
