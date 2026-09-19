@@ -36,6 +36,7 @@ final class HandDealController extends AbstractController
                 attachables: [new Model(type: DealHandResponse::class)],
             ),
             new OA\Response(response: 401, description: 'Missing or invalid JWT'),
+            new OA\Response(response: 403, description: 'Authenticated user lacks ROLE_API'),
             new OA\Response(response: 422, description: 'Validation error'),
         ],
     )]
