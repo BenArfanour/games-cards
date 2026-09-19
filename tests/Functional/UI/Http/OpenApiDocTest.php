@@ -35,5 +35,9 @@ final class OpenApiDocTest extends WebTestCase
         self::assertArrayHasKey('/api/hands/deal', $data['paths']);
         self::assertArrayHasKey('/api/login_check', $data['paths']);
         self::assertArrayHasKey('/api/token/refresh', $data['paths']);
+
+        /** @var array{post: array{responses: array<string, mixed>}} $dealHandPath */
+        $dealHandPath = $data['paths']['/api/hands/deal'];
+        self::assertArrayHasKey('403', $dealHandPath['post']['responses']);
     }
 }
