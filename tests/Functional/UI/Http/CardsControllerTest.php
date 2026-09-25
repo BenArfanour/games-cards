@@ -38,6 +38,14 @@ final class CardsControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function testCardsApiRejectsAuthenticatedUserWithoutApiRole(): void
+    {
+        $client = $this->createAuthenticatedClient('limited_user');
+        $client->request('GET', '/cards');
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
     public function testCardsApiReturnsJsonWhenAuthenticated(): void
     {
         $client = $this->createAuthenticatedClient();
